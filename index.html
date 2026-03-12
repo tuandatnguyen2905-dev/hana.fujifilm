@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>hana.fujifilm — Rental Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --pearl:      #f5f2ee;
+  --pearl2:     #ede9e3;
+  --pearl3:     #e4dfd8;
+  --cream:      #faf8f5;
+  --silk:       #d6cfc6;
+  --stone:      #b5ada4;
+  --taupe:      #8c847b;
+  --warm-dark:  #3d3830;
+  --warm-mid:   #5c5248;
+  --ink:        #2a2520;
+  --gold:       #b89a6e;
+  --gold-light: #d4b98a;
+  --gold-dim:   rgba(184,154,110,.14);
+  --gold-border:rgba(184,154,110,.3);
+  --cam-x100v:  #b07840;
+  --cam-xs20:   #4a8faa;
+  --cam-xs10:   #7a68a8;
+  --cam-xt4:    #a85050;
+  --success:    #5a9e7a;
+  --warn:       #b8863a;
+  --danger:     #a85050;
+  --r:10px;
+  --sh:0 2px 16px rgba(61,56,48,.08);
+  --sh-md:0 6px 32px rgba(61,56,48,.13);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Mulish',sans-serif;background:var(--pearl);color:var(--warm-dark);min-height:100vh;overflow-x:hidden}
+
+/* ── HEADER ── */
+header{display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:56px;background:var(--cream);border-bottom:1px solid var(--pearl3);position:sticky;top:0;z-index:300;box-shadow:0 1px 10px rgba(61,56,48,.06)}
+.logo-wrap{display:flex;align-items:center;gap:12px}
+.logo-script{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:400;font-size:22px;color:var(--warm-dark);letter-spacing:.5px;line-height:1}
+.logo-script em{color:var(--gold);font-style:italic}
+.logo-sep{width:1px;height:20px;background:var(--silk)}
+.logo-tag{font-size:9px;font-weight:700;color:var(--stone);letter-spacing:2.5px;text-transform:uppercase}
+.header-right{display:flex;align-items:center;gap:10px}
+.hpills{display:flex;gap:6px}
+.hpill{display:flex;align-items:center;gap:5px;background:var(--pearl2);border:1px solid var(--pearl3);padding:4px 11px;border-radius:999px;font-size:11px;font-weight:600;color:var(--warm-mid)}
+.hpdot{width:6px;height:6px;border-radius:50%}
+
+/* ── BOOK BUTTON in header ── */
+.btn-new-booking{
+  display:flex;align-items:center;gap:6px;
+  background:var(--warm-dark);color:var(--cream);
+  border:none;padding:7px 16px;border-radius:var(--r);
+  font-family:'Mulish',sans-serif;font-size:10px;font-weight:900;
+  letter-spacing:2px;text-transform:uppercase;cursor:pointer;
+  transition:all .2s;
+}
+.btn-new-booking:hover{background:var(--ink);box-shadow:0 4px 16px rgba(42,37,32,.18);transform:translateY(-1px)}
+.btn-new-booking svg{flex-shrink:0}
+
+/* ── MAIN LAYOUT ── */
+.main-wrap{display:grid;grid-template-columns:1fr 300px;height:calc(100vh - 56px);overflow:hidden}
+
+/* ── CALENDAR PANEL ── */
+.cal-panel{overflow-y:auto;padding:24px 28px}
+.cal-panel::-webkit-scrollbar{width:3px}
+.cal-panel::-webkit-scrollbar-thumb{background:var(--silk);border-radius:2px}
+
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.cal-nav-l{display:flex;align-items:center;gap:10px}
+.nav-btn{background:var(--cream);border:1px solid var(--pearl3);color:var(--taupe);width:30px;height:30px;border-radius:7px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'Mulish',sans-serif;box-shadow:var(--sh)}
+.nav-btn:hover{border-color:var(--gold);color:var(--gold)}
+.month-lbl{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;font-weight:400;color:var(--warm-dark);min-width:160px}
+.today-btn{font-family:'Mulish',sans-serif;font-style:normal;font-size:9px;font-weight:900;letter-spacing:1.5px;padding:0 10px;width:auto;text-transform:uppercase}
+.legend{display:flex;gap:12px;flex-wrap:wrap}
+.leg-i{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:var(--stone)}
+.leg-d{width:7px;height:7px;border-radius:2px}
+
+/* ── CALENDAR GRID ── */
+.cal{border:1px solid var(--pearl3);border-radius:12px;overflow:hidden;background:var(--pearl3);gap:1px;display:grid;grid-template-columns:repeat(7,1fr);box-shadow:var(--sh)}
+.cal-dh{background:var(--cream);padding:9px 4px;text-align:center;font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--stone)}
+
+.cal-cell{
+  background:var(--cream);
+  min-height:110px;
+  padding:7px 6px 5px;
+  transition:background .1s;
+  position:relative;
+  display:flex;flex-direction:column;gap:2px;
+}
+.cal-cell:hover{background:var(--pearl2)}
+.cal-cell.today{background:#fdf9f2}
+.cal-cell.other{background:var(--pearl);opacity:.45}
+
+.cal-daynum{
+  font-size:11px;font-weight:800;color:var(--stone);
+  margin-bottom:3px;letter-spacing:.3px;flex-shrink:0;
+}
+.cal-cell.today .cal-daynum{color:var(--gold)}
+.cal-cell.today .cal-daynum::after{content:'•';margin-left:2px;color:var(--gold)}
+
+/* ── FREE CAMERAS TAGS on cell ── */
+.cal-free-cams{display:flex;flex-wrap:wrap;gap:2px;margin-bottom:3px}
+.free-cam-tag{
+  font-size:8px;font-weight:800;letter-spacing:.3px;
+  padding:1px 5px;border-radius:3px;
+  border:1px solid currentColor;
+  opacity:.7;
+}
+
+/* ── BOOKING PILLS ── */
+.cpill{
+  display:flex;align-items:center;gap:3px;
+  padding:2px 6px;border-radius:4px;
+  font-size:9px;font-weight:800;
+  cursor:pointer;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  transition:opacity .15s;letter-spacing:.2px;position:relative;
+  flex-shrink:0;
+}
+.cpill:hover{opacity:.72}
+.cpill-dot{width:3px;height:3px;border-radius:50%;flex-shrink:0}
+.cpill-more{font-size:9px;font-weight:700;color:var(--stone);flex-shrink:0}
+
+/* deliver flag */
+.deliver-flag{position:absolute;top:5px;right:5px;font-size:10px;line-height:1}
+
+/* TOOLTIP */
+.tt-wrap{position:relative}
+.tt-box{display:none;position:fixed;background:var(--cream);border:1px solid var(--pearl3);border-radius:var(--r);padding:10px 12px;min-width:180px;max-width:240px;z-index:999;box-shadow:var(--sh-md);pointer-events:none;font-size:11px}
+.tt-wrap:hover .tt-box{display:block}
+.tt-head{font-size:9px;font-weight:800;letter-spacing:1px;color:var(--stone);text-transform:uppercase;margin-bottom:5px;border-bottom:1px solid var(--pearl3);padding-bottom:3px}
+.tt-note{font-size:10px;line-height:1.4;color:var(--warn);background:rgba(184,134,58,.07);border-left:2px solid var(--warn);padding:3px 6px;border-radius:0 4px 4px 0;margin-top:3px}
+
+/* ── RIGHT PANEL ── */
+.right-panel{
+  background:var(--cream);
+  border-left:1px solid var(--pearl3);
+  overflow-y:auto;
+  display:flex;flex-direction:column;
+}
+.right-panel::-webkit-scrollbar{width:3px}
+.right-panel::-webkit-scrollbar-thumb{background:var(--silk);border-radius:2px}
+
+/* availability checker */
+.avail-checker{padding:20px 18px;border-bottom:1px solid var(--pearl3)}
+.panel-title{font-size:9px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:var(--stone);margin-bottom:14px}
+
+.checker-dates{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.date-field label{display:block;font-size:9px;font-weight:800;letter-spacing:.5px;color:var(--taupe);text-transform:uppercase;margin-bottom:3px}
+.date-field input{
+  width:100%;background:var(--pearl);border:1px solid var(--pearl3);
+  color:var(--warm-dark);padding:7px 9px;border-radius:8px;
+  font-family:'Mulish',sans-serif;font-size:11px;font-weight:500;outline:none;
+  transition:border-color .2s;
+}
+.date-field input:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim)}
+
+/* rental type selector for checker */
+.rtype-select{margin-bottom:10px}
+.rtype-select label{display:block;font-size:9px;font-weight:800;letter-spacing:.5px;color:var(--taupe);text-transform:uppercase;margin-bottom:4px}
+.rtype-select select{width:100%;background:var(--pearl);border:1px solid var(--pearl3);color:var(--warm-dark);padding:7px 9px;border-radius:8px;font-family:'Mulish',sans-serif;font-size:11px;font-weight:500;outline:none;transition:border-color .2s}
+.rtype-select select:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim)}
+
+/* cam availability result cards */
+.avail-results{display:flex;flex-direction:column;gap:6px;margin-top:2px}
+
+.avail-cam-card{
+  border:1px solid var(--pearl3);
+  border-radius:var(--r);
+  padding:10px 12px;
+  transition:all .15s;
+  cursor:default;
+}
+
+.avail-cam-card.free{background:var(--pearl);border-color:rgba(90,158,122,.25)}
+.avail-cam-card.busy{background:#faf8f5;opacity:.55}
+
+.acard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.acard-cam{font-size:12px;font-weight:900;letter-spacing:.3px}
+.acard-status{font-size:9px;font-weight:800;padding:2px 8px;border-radius:999px;letter-spacing:.5px}
+
+.acard-pricing{display:flex;flex-direction:column;gap:3px}
+.acard-price-row{display:flex;justify-content:space-between;font-size:11px}
+.acard-price-label{color:var(--stone);font-weight:600}
+.acard-price-val{font-weight:800;color:var(--warm-dark)}
+.acard-total{
+  display:flex;justify-content:space-between;
+  padding-top:5px;
+  border-top:1px solid var(--pearl3);
+  font-size:12px;margin-top:2px;
+}
+.acard-total-label{color:var(--taupe);font-weight:700}
+.acard-total-val{font-weight:900;color:var(--warm-dark);font-size:13px}
+
+.checker-hint{font-size:10px;color:var(--stone);font-weight:600;text-align:center;padding:16px 0}
+
+/* booking list panel */
+.blist-panel{padding:20px 18px;flex:1}
+.blist-filters{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px}
+.fbtn{background:var(--pearl);border:1px solid var(--pearl3);color:var(--stone);padding:3px 9px;border-radius:999px;font-size:10px;font-weight:800;cursor:pointer;letter-spacing:.2px;transition:all .15s;font-family:'Mulish',sans-serif}
+.fbtn:hover,.fbtn.on{border-color:var(--gold);color:var(--warm-dark);background:var(--gold-dim)}
+
+.bcard{
+  background:var(--pearl);border:1px solid var(--pearl3);border-radius:var(--r);
+  padding:10px 11px;margin-bottom:6px;
+  display:grid;grid-template-columns:34px 1fr auto;gap:9px;align-items:center;
+  transition:all .15s;animation:fUp .2s ease both;cursor:pointer;
+}
+@keyframes fUp{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:translateY(0)}}
+.bcard:hover{border-color:var(--silk);box-shadow:var(--sh)}
+.bcam{width:34px;height:34px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:900;letter-spacing:.4px;flex-shrink:0;text-align:center}
+.binfo .bname{font-size:12px;font-weight:800;margin-bottom:1px}
+.binfo .bsub{font-size:9px;color:var(--stone);font-weight:600}
+.binfo .btags{display:flex;gap:2px;flex-wrap:wrap;margin-top:2px}
+.btag{font-size:8px;font-weight:800;padding:1px 5px;border-radius:3px}
+.bamt{font-size:12px;font-weight:900;color:var(--warm-dark);white-space:nowrap;text-align:right}
+.bdate-small{font-size:9px;color:var(--stone);font-weight:600;white-space:nowrap;text-align:right;margin-top:1px}
+
+.empty{text-align:center;padding:28px 0;color:var(--stone)}
+.empty-ico{font-size:26px;margin-bottom:6px;opacity:.5}
+.empty-txt{font-size:11px;font-weight:600}
+
+/* ── BOOKING MODAL (drawer-style from right) ── */
+.bk-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(42,37,32,.4);backdrop-filter:blur(3px);
+  z-index:400;
+}
+.bk-overlay.open{display:block}
+
+.bk-drawer{
+  position:fixed;top:0;right:0;bottom:0;
+  width:420px;
+  background:var(--cream);
+  border-left:1px solid var(--pearl3);
+  box-shadow:-8px 0 40px rgba(42,37,32,.12);
+  z-index:401;
+  display:flex;flex-direction:column;
+  transform:translateX(100%);
+  transition:transform .28s cubic-bezier(.4,0,.2,1);
+}
+.bk-overlay.open .bk-drawer{transform:translateX(0)}
+
+.bk-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 22px 16px;
+  border-bottom:1px solid var(--pearl3);
+  flex-shrink:0;
+}
+.bk-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;font-weight:400;color:var(--warm-dark)}
+.bk-close{background:none;border:1px solid var(--pearl3);color:var(--taupe);width:30px;height:30px;border-radius:7px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.bk-close:hover{border-color:var(--gold);color:var(--warm-dark)}
+
+.bk-body{overflow-y:auto;padding:20px 22px;flex:1}
+.bk-body::-webkit-scrollbar{width:3px}
+.bk-body::-webkit-scrollbar-thumb{background:var(--silk);border-radius:2px}
+
+.bk-footer{padding:14px 22px;border-top:1px solid var(--pearl3);flex-shrink:0}
+
+/* form fields inside drawer */
+.stitle{font-size:9px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:var(--stone);margin-bottom:10px}
+.fg{margin-bottom:10px}
+.fg label{display:block;font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--taupe);text-transform:uppercase;margin-bottom:3px}
+.fg input,.fg select,.fg textarea{
+  width:100%;background:var(--pearl);border:1px solid var(--pearl3);
+  color:var(--warm-dark);padding:8px 11px;border-radius:var(--r);
+  font-family:'Mulish',sans-serif;font-size:12px;font-weight:500;outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim)}
+.fg select option{background:var(--cream);color:var(--warm-dark)}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+.cam-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.cam-opt{border:1.5px solid var(--pearl3);background:var(--pearl);border-radius:var(--r);padding:9px 5px 7px;cursor:pointer;transition:all .15s;text-align:center}
+.cam-opt:hover{border-color:var(--silk);background:var(--pearl2)}
+.cam-opt.sel{border-color:var(--gold);background:var(--gold-dim)}
+.cam-swatch{width:7px;height:7px;border-radius:50%;margin:0 auto 4px}
+.cam-lbl{font-size:9px;font-weight:800;letter-spacing:.5px;color:var(--taupe)}
+.cam-opt.sel .cam-lbl{color:var(--warm-dark)}
+
+.rental-block{border:1px solid var(--pearl3);border-radius:var(--r);overflow:hidden;margin-bottom:10px;background:var(--pearl)}
+.rrow{display:flex;align-items:center;justify-content:space-between;padding:9px 11px;cursor:pointer;transition:background .15s;border-bottom:1px solid var(--pearl3);gap:8px}
+.rrow:last-child{border-bottom:none}
+.rrow:hover{background:var(--pearl2)}
+.rrow.sel{background:var(--gold-dim)}
+.rrow-l{display:flex;align-items:center;gap:8px}
+.rradio{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--silk);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.rrow.sel .rradio{border-color:var(--gold)}
+.rradio::after{content:'';width:5px;height:5px;border-radius:50%;background:var(--gold);opacity:0;transition:opacity .15s}
+.rrow.sel .rradio::after{opacity:1}
+.rname{font-size:12px;font-weight:600;color:var(--taupe)}
+.rrow.sel .rname{color:var(--warm-dark);font-weight:700}
+.rprice{font-size:11px;font-weight:600;color:var(--stone);white-space:nowrap}
+.rrow.sel .rprice{color:var(--gold);font-weight:700}
+
+.ca-sec{margin-bottom:10px;display:none}
+.ca-sec.vis{display:block}
+.ca-lrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.ca-lrow label{margin:0}
+.ca-pre{font-size:11px;font-weight:700;color:var(--gold)}
+.ca-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.ca-opt{border:1.5px solid var(--pearl3);background:var(--pearl);border-radius:var(--r);padding:8px 4px;cursor:pointer;transition:all .15s;text-align:center}
+.ca-opt:hover{border-color:var(--silk);background:var(--pearl2)}
+.ca-opt.sel{border-color:var(--gold);background:var(--gold-dim)}
+.ca-icon{font-size:14px;margin-bottom:2px}
+.ca-name{font-size:10px;font-weight:800;letter-spacing:.2px;color:var(--taupe)}
+.ca-time{font-size:9px;color:var(--stone);margin-top:1px;font-weight:600}
+.ca-opt.sel .ca-name{color:var(--warm-dark)}
+.ca-cnt{margin-top:4px;font-size:11px;color:var(--stone);font-weight:600}
+
+.pbox{background:linear-gradient(135deg,var(--pearl2),var(--pearl3));border:1px solid var(--gold-border);border-radius:var(--r);padding:11px 13px;margin:10px 0;display:flex;align-items:center;justify-content:space-between}
+.pbox-lbl{font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--stone)}
+.pbox-sub{font-size:10px;color:var(--taupe);margin-top:1px;font-weight:500}
+.pbox-val{font-size:18px;font-weight:900;color:var(--warm-dark);letter-spacing:-.5px}
+.disc-line{font-size:10px;color:var(--success);font-weight:700;margin-top:1px}
+
+.btn-add{width:100%;background:var(--warm-dark);color:var(--cream);border:none;padding:12px;border-radius:var(--r);font-family:'Mulish',sans-serif;font-size:10px;font-weight:900;letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.btn-add:hover{background:var(--ink);box-shadow:0 4px 16px rgba(42,37,32,.2);transform:translateY(-1px)}
+
+/* ── BOOKING DETAIL MODAL ── */
+.moverlay{display:none;position:fixed;inset:0;background:rgba(42,37,32,.5);backdrop-filter:blur(4px);z-index:500;align-items:center;justify-content:center}
+.moverlay.open{display:flex}
+.modal{background:var(--cream);border:1px solid var(--pearl3);border-radius:14px;padding:24px;max-width:400px;width:92%;animation:mPop .18s ease;max-height:90vh;overflow-y:auto;box-shadow:var(--sh-md)}
+@keyframes mPop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+.m-cam-line{display:inline-flex;align-items:center;gap:5px;font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;color:var(--stone)}
+.m-cam-dot{width:7px;height:7px;border-radius:2px}
+.m-cust{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;font-weight:400;color:var(--warm-dark);margin-bottom:2px}
+.m-sub{font-size:11px;color:var(--stone);font-weight:600;margin-bottom:12px}
+.m-body{background:var(--pearl2);border-radius:var(--r);padding:12px;margin-bottom:11px;border:1px solid var(--pearl3)}
+.mrow{display:flex;justify-content:space-between;margin-bottom:7px;font-size:12px}
+.mrow:last-child{margin-bottom:0}
+.mk{color:var(--stone);font-weight:600}
+.mv{font-weight:800;color:var(--warm-dark)}
+.m-note{background:rgba(184,134,58,.06);border:1px solid rgba(184,134,58,.2);border-radius:7px;padding:9px 11px;margin-top:8px}
+.m-note-lbl{font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--warn);margin-bottom:3px}
+.m-note-txt{font-size:12px;color:var(--warm-dark);font-weight:500;line-height:1.5}
+.modal-btns{display:flex;gap:8px}
+.mbtn{flex:1;background:var(--pearl2);border:1px solid var(--pearl3);color:var(--taupe);padding:9px;border-radius:var(--r);cursor:pointer;font-family:'Mulish',sans-serif;font-size:12px;font-weight:700;transition:all .15s}
+.mbtn:hover{border-color:var(--gold);color:var(--warm-dark)}
+.mbtn-del{background:rgba(168,80,80,.07);border-color:rgba(168,80,80,.2);color:var(--danger)}
+.mbtn-del:hover{background:rgba(168,80,80,.12);border-color:var(--danger)}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;right:22px;padding:9px 16px;border-radius:var(--r);font-size:12px;font-weight:700;z-index:600;opacity:0;transform:translateY(10px);transition:all .22s ease;pointer-events:none;box-shadow:var(--sh-md)}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* pill colours */
+.pill-x100v{background:rgba(176,120,64,.12);color:#7a5020}
+.pill-xs20{background:rgba(74,143,170,.12);color:#2a6a84}
+.pill-xs10{background:rgba(122,104,168,.12);color:#4a3888}
+.pill-xt4{background:rgba(168,80,80,.12);color:#882828}
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="logo-wrap">
+    <div class="logo-script">hana.<em>fuji</em>film</div>
+    <div class="logo-sep"></div>
+    <div class="logo-tag">Rental Manager</div>
+  </div>
+  <div class="header-right">
+    <div class="hpills">
+      <div class="hpill"><div class="hpdot" style="background:var(--cam-xs20)"></div><span id="hp-kh">0 KH tháng này</span></div>
+      <div class="hpill"><div class="hpdot" style="background:var(--warn)"></div><span id="hp-del">0 giao hôm nay</span></div>
+      <div class="hpill"><div class="hpdot" style="background:var(--gold)"></div><span id="hp-rev">0đ tháng này</span></div>
+    </div>
+    <button class="btn-new-booking" onclick="openBookingDrawer()">
+      <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M5.5 1v9M1 5.5h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      Đặt lịch mới
+    </button>
+  </div>
+</header>
+
+<!-- ── MAIN ── -->
+<div class="main-wrap">
+
+  <!-- CALENDAR -->
+  <div class="cal-panel">
+    <div class="cal-nav">
+      <div class="cal-nav-l">
+        <button class="nav-btn" onclick="changeMonth(-1)">‹</button>
+        <div class="month-lbl" id="month-lbl"></div>
+        <button class="nav-btn" onclick="changeMonth(1)">›</button>
+        <button class="nav-btn today-btn" onclick="goToday()">Hôm nay</button>
+      </div>
+      <div class="legend">
+        <div class="leg-i"><div class="leg-d" style="background:rgba(176,120,64,.5)"></div>X100V</div>
+        <div class="leg-i"><div class="leg-d" style="background:rgba(74,143,170,.5)"></div>XS20</div>
+        <div class="leg-i"><div class="leg-d" style="background:rgba(122,104,168,.5)"></div>XS10</div>
+        <div class="leg-i"><div class="leg-d" style="background:rgba(168,80,80,.5)"></div>XT4</div>
+        <div class="leg-i"><div class="leg-d" style="background:var(--warn);opacity:.6"></div>📦 Giao</div>
+      </div>
+    </div>
+    <div class="cal" id="cal"></div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+
+    <!-- AVAILABILITY CHECKER -->
+    <div class="avail-checker">
+      <div class="panel-title">Kiểm tra máy trống</div>
+      <div class="checker-dates">
+        <div class="date-field">
+          <label>Từ ngày</label>
+          <input type="date" id="ck-from" oninput="runChecker()">
+        </div>
+        <div class="date-field">
+          <label>Đến ngày</label>
+          <input type="date" id="ck-to" oninput="runChecker()">
+        </div>
+      </div>
+      <div class="rtype-select">
+        <label>Hình thức thuê</label>
+        <select id="ck-type" onchange="runChecker()">
+          <option value="ngay">Thuê theo ngày</option>
+          <option value="ca">Thuê theo ca</option>
+          <option value="n3">Thuê 3 ngày</option>
+          <option value="n5">Thuê 5 ngày</option>
+        </select>
+      </div>
+      <div id="ck-results"><div class="checker-hint">Chọn khoảng ngày để kiểm tra</div></div>
+    </div>
+
+    <!-- BOOKING LIST -->
+    <div class="blist-panel">
+      <div class="panel-title">Lịch thuê</div>
+      <div class="blist-filters">
+        <button class="fbtn on" onclick="setFilter(this,'all')">Tất cả</button>
+        <button class="fbtn" onclick="setFilter(this,'X100V')">X100V</button>
+        <button class="fbtn" onclick="setFilter(this,'XS20')">XS20</button>
+        <button class="fbtn" onclick="setFilter(this,'XS10')">XS10</button>
+        <button class="fbtn" onclick="setFilter(this,'XT4')">XT4</button>
+      </div>
+      <div id="blist"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── BOOKING DRAWER ── -->
+<div class="bk-overlay" id="bk-overlay" onclick="handleOverlayClick(event)">
+  <div class="bk-drawer">
+    <div class="bk-header">
+      <div class="bk-title">Đặt lịch mới</div>
+      <button class="bk-close" onclick="closeBookingDrawer()">✕</button>
+    </div>
+    <div class="bk-body">
+
+      <div class="fg"><label>Tên khách hàng</label><input id="f-name" type="text" placeholder="Nguyễn Văn A"></div>
+      <div class="frow">
+        <div class="fg"><label>Số điện thoại</label><input id="f-phone" type="text" placeholder="0901 234 567"></div>
+        <div class="fg"><label>Kênh đặt</label>
+          <select id="f-channel"><option>Facebook</option><option>Zalo</option><option>Instagram</option><option>Trực tiếp</option><option>Khác</option></select>
+        </div>
+      </div>
+      <div class="fg"><label>Hình thức giao máy</label>
+        <select id="f-delivery">
+          <option value="direct">🤝 Trực tiếp (gặp mặt)</option>
+          <option value="online">🚚 Trực tuyến (ship / chuyển phát)</option>
+        </select>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Hình thức cọc</label>
+          <select id="f-deposit">
+            <option value="cash">💵 Tiền mặt</option>
+            <option value="valuables">💎 Vật dụng có giá trị</option>
+            <option value="docs">📄 Giấy tờ bổ sung</option>
+            <option value="none">— Không cọc</option>
+          </select>
+        </div>
+        <div class="fg"><label>Chiết khấu (%)</label>
+          <input id="f-discount" type="number" min="0" max="100" placeholder="0" oninput="updatePrice()">
+        </div>
+      </div>
+
+      <div class="fg"><label>Máy ảnh</label>
+        <div class="cam-grid">
+          <div class="cam-opt" data-cam="X100V" onclick="pickCam(this)"><div class="cam-swatch" style="background:var(--cam-x100v)"></div><div class="cam-lbl">X100V</div></div>
+          <div class="cam-opt" data-cam="XS20"  onclick="pickCam(this)"><div class="cam-swatch" style="background:var(--cam-xs20)"></div><div class="cam-lbl">XS20</div></div>
+          <div class="cam-opt" data-cam="XS10"  onclick="pickCam(this)"><div class="cam-swatch" style="background:var(--cam-xs10)"></div><div class="cam-lbl">XS10</div></div>
+          <div class="cam-opt" data-cam="XT4"   onclick="pickCam(this)"><div class="cam-swatch" style="background:var(--cam-xt4)"></div><div class="cam-lbl">XT4</div></div>
+        </div>
+      </div>
+
+      <div class="fg"><label>Hình thức thuê</label><div class="rental-block" id="rental-block"></div></div>
+
+      <div class="ca-sec" id="ca-sec">
+        <div class="ca-lrow"><label>Chọn ca</label><span class="ca-pre" id="ca-pre"></span></div>
+        <div class="ca-grid">
+          <div class="ca-opt" data-ca="sang"  onclick="toggleCa(this)"><div class="ca-icon">🌅</div><div class="ca-name">Ca Sáng</div><div class="ca-time">6:00–12:00</div></div>
+          <div class="ca-opt" data-ca="chieu" onclick="toggleCa(this)"><div class="ca-icon">☀️</div><div class="ca-name">Ca Chiều</div><div class="ca-time">12:00–18:00</div></div>
+          <div class="ca-opt" data-ca="toi"   onclick="toggleCa(this)"><div class="ca-icon">🌙</div><div class="ca-name">Ca Tối</div><div class="ca-time">18:00–24:00</div></div>
+        </div>
+        <div class="ca-cnt" id="ca-cnt"></div>
+      </div>
+
+      <div class="frow">
+        <div class="fg"><label>Ngày bắt đầu</label><input id="f-start" type="date"></div>
+        <div class="fg"><label>Ngày kết thúc</label><input id="f-end" type="date" readonly style="opacity:.45"></div>
+      </div>
+
+      <div class="pbox">
+        <div>
+          <div class="pbox-lbl">Tổng dự kiến</div>
+          <div class="pbox-sub" id="p-sub">Chọn máy &amp; hình thức</div>
+          <div class="disc-line" id="p-disc"></div>
+        </div>
+        <div class="pbox-val" id="p-val">—</div>
+      </div>
+
+      <div class="fg"><label>Ghi chú / Yêu cầu đặc biệt</label>
+        <textarea id="f-note" rows="2" placeholder="Yêu cầu đặc biệt, địa điểm giao máy..."></textarea>
+      </div>
+    </div>
+
+    <div class="bk-footer">
+      <button class="btn-add" onclick="addBooking()">+ Xác nhận đặt lịch</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── BOOKING DETAIL MODAL ── -->
+<div class="moverlay" id="modal">
+  <div class="modal">
+    <div class="m-cam-line"><div class="m-cam-dot" id="m-dot"></div><span id="m-cam"></span></div>
+    <div class="m-cust" id="m-cust"></div>
+    <div class="m-sub" id="m-sub"></div>
+    <div class="m-body" id="m-body"></div>
+    <div class="modal-btns">
+      <button class="mbtn" onclick="closeModal()">Đóng</button>
+      <button class="mbtn mbtn-del" id="m-del-btn">Xóa lịch</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══ DATA ═══
+const CAMS = ['X100V','XS20','XS10','XT4'];
+const CC  = {X100V:'#b07840',XS20:'#4a8faa',XS10:'#7a68a8',XT4:'#a85050'};
+const CB  = {X100V:'rgba(176,120,64,.12)',XS20:'rgba(74,143,170,.12)',XS10:'rgba(122,104,168,.12)',XT4:'rgba(168,80,80,.12)'};
+const CT  = {X100V:'#7a5020',XS20:'#2a6a84',XS10:'#4a3888',XT4:'#882828'};
+const PCLS= {X100V:'pill-x100v',XS20:'pill-xs20',XS10:'pill-xs10',XT4:'pill-xt4'};
+
+const PRICE = {
+  X100V:{ca:150000,ngay:250000,n3:650000,n5:950000},
+  XS20: {ca:120000,ngay:200000,n3:520000,n5:780000},
+  XS10: {ca:100000,ngay:170000,n3:440000,n5:650000},
+  XT4:  {ca:130000,ngay:220000,n3:580000,n5:850000},
+};
+
+// Day-rate for availability checker (price per 1 day for display)
+const DAY_RATE = {X100V:250000,XS20:200000,XS10:170000,XT4:220000};
+const CA_RATE  = {X100V:150000,XS20:120000,XS10:100000,XT4:130000};
+
+const RTYPE_PRICE = {
+  ngay:{label:'Thuê 1 ngày', dur:1, fn:(cam)=>PRICE[cam].ngay},
+  ca:  {label:'Thuê theo ca',dur:0, fn:(cam)=>PRICE[cam].ca},
+  n3:  {label:'Thuê 3 ngày', dur:3, fn:(cam)=>PRICE[cam].n3},
+  n5:  {label:'Thuê 5 ngày', dur:5, fn:(cam)=>PRICE[cam].n5},
+};
+
+const RT = [
+  {key:'ca',  label:'Thuê theo ca',dur:0},
+  {key:'ngay',label:'Thuê 1 ngày', dur:1},
+  {key:'n3',  label:'Thuê 3 ngày', dur:3},
+  {key:'n5',  label:'Thuê 5 ngày', dur:5},
+];
+
+const CAI = {
+  sang: {label:'Ca Sáng', icon:'🌅',time:'6:00–12:00'},
+  chieu:{label:'Ca Chiều',icon:'☀️', time:'12:00–18:00'},
+  toi:  {label:'Ca Tối',  icon:'🌙',time:'18:00–24:00'},
+};
+
+const DEP = {cash:'💵 Tiền mặt',valuables:'💎 Vật dụng giá trị',docs:'📄 Giấy tờ',none:'— Không cọc'};
+const DEL = {direct:'🤝 Trực tiếp',online:'🚚 Trực tuyến'};
+
+let bookings  = JSON.parse(localStorage.getItem('hanabook5') || '[]');
+let curMonth  = new Date();
+let selCam    = null, selRental = null, selCas = new Set();
+let curFilter = 'all';
+let curDetailId = null;
+
+// ═══ INIT ═══
+function init() {
+  buildRentalBlock();
+  renderCalendar();
+  renderBlist();
+  renderStats();
+  document.getElementById('f-start').value = todayStr();
+  document.getElementById('f-start').addEventListener('change', () => { updateEnd(); updatePrice(); });
+  // set checker defaults to today
+  document.getElementById('ck-from').value = todayStr();
+  document.getElementById('ck-to').value   = todayStr();
+  runChecker();
+}
+
+const todayStr = () => new Date().toISOString().split('T')[0];
+
+// ═══ DRAWER ═══
+function openBookingDrawer() {
+  document.getElementById('bk-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeBookingDrawer() {
+  document.getElementById('bk-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('bk-overlay')) closeBookingDrawer();
+}
+
+// ═══ FORM ═══
+function buildRentalBlock() {
+  document.getElementById('rental-block').innerHTML = RT.map(r => `
+    <div class="rrow" onclick="pickRental(this,'${r.key}')">
+      <div class="rrow-l"><div class="rradio"></div><div class="rname">${r.label}</div></div>
+      <div class="rprice" id="rp-${r.key}">—</div>
+    </div>`).join('');
+}
+
+function pickCam(el) {
+  document.querySelectorAll('.cam-opt').forEach(e => e.classList.remove('sel'));
+  el.classList.add('sel');
+  selCam = el.dataset.cam;
+  RT.forEach(r => { const e = document.getElementById('rp-' + r.key); if (e) e.textContent = fmtVND(PRICE[selCam][r.key]); });
+  updateCaPre(); updatePrice();
+}
+
+function pickRental(el, key) {
+  document.querySelectorAll('.rrow').forEach(e => e.classList.remove('sel'));
+  el.classList.add('sel'); selRental = key;
+  const s = document.getElementById('ca-sec');
+  if (key === 'ca') { s.classList.add('vis'); }
+  else { s.classList.remove('vis'); selCas.clear(); document.querySelectorAll('.ca-opt').forEach(e => e.classList.remove('sel')); }
+  updateEnd(); updatePrice();
+}
+
+function toggleCa(el) {
+  const ca = el.dataset.ca;
+  if (selCas.has(ca)) { selCas.delete(ca); el.classList.remove('sel'); }
+  else { selCas.add(ca); el.classList.add('sel'); }
+  updateCaPre(); updatePrice();
+}
+
+function updateCaPre() {
+  const p = document.getElementById('ca-pre'), c = document.getElementById('ca-cnt');
+  if (!selCam) { p.textContent = ''; c.textContent = ''; return; }
+  const n = selCas.size, u = PRICE[selCam].ca;
+  p.textContent = n > 0 ? fmtVND(n * u) : '';
+  c.textContent = n === 0 ? 'Chưa chọn ca nào' : `${n} ca × ${fmtVND(u)} = ${fmtVND(n * u)}`;
+}
+
+function updateEnd() {
+  if (!selRental) return;
+  const s = document.getElementById('f-start').value; if (!s) return;
+  const rt = RT.find(r => r.key === selRental), ee = document.getElementById('f-end');
+  if (rt.dur <= 1) { ee.value = s; ee.style.opacity = '.45'; }
+  else { const d = new Date(s); d.setDate(d.getDate() + rt.dur - 1); ee.value = d.toISOString().split('T')[0]; ee.style.opacity = '1'; }
+}
+
+function basePrice() {
+  if (!selCam || !selRental) return 0;
+  return selRental === 'ca' ? selCas.size * PRICE[selCam].ca : PRICE[selCam][selRental];
+}
+
+function updatePrice() {
+  const disc = parseFloat(document.getElementById('f-discount').value) || 0;
+  const base = basePrice(), final = Math.round(base * (1 - disc / 100));
+  const pv = document.getElementById('p-val'), ps = document.getElementById('p-sub'), pd = document.getElementById('p-disc');
+  if (!selCam || !selRental) { pv.textContent = '—'; ps.textContent = 'Chọn máy & hình thức'; pd.textContent = ''; return; }
+  pv.textContent = fmtVND(final);
+  const rt = RT.find(r => r.key === selRental);
+  ps.textContent = `${selCam} · ${selRental === 'ca' ? selCas.size + ' ca' : rt.label}`;
+  pd.textContent = disc > 0 ? `Giảm ${disc}% từ ${fmtVND(base)}` : '';
+}
+
+// ═══ ADD BOOKING ═══
+function addBooking() {
+  const name     = document.getElementById('f-name').value.trim();
+  const phone    = document.getElementById('f-phone').value.trim();
+  const chan     = document.getElementById('f-channel').value;
+  const delivery = document.getElementById('f-delivery').value;
+  const deposit  = document.getElementById('f-deposit').value;
+  const discount = parseFloat(document.getElementById('f-discount').value) || 0;
+  const start    = document.getElementById('f-start').value;
+  const note     = document.getElementById('f-note').value.trim();
+
+  if (!name)      return toast('⚠ Vui lòng nhập tên khách hàng', true);
+  if (!selCam)    return toast('⚠ Vui lòng chọn máy ảnh', true);
+  if (!selRental) return toast('⚠ Vui lòng chọn hình thức thuê', true);
+  if (!start)     return toast('⚠ Vui lòng chọn ngày bắt đầu', true);
+  if (selRental === 'ca' && selCas.size === 0) return toast('⚠ Vui lòng chọn ít nhất 1 ca', true);
+
+  const rt = RT.find(r => r.key === selRental);
+  let end = start;
+  if (rt.dur > 1) { const d = new Date(start); d.setDate(d.getDate() + rt.dur - 1); end = d.toISOString().split('T')[0]; }
+  const bp = selRental === 'ca' ? selCas.size * PRICE[selCam].ca : PRICE[selCam][selRental];
+  const price = Math.round(bp * (1 - discount / 100));
+
+  bookings.push({ id: Date.now().toString(), name, phone, chan, delivery, deposit, discount, camera: selCam, rental: selRental, rentalLabel: rt.label, cas: selRental === 'ca' ? [...selCas] : [], start, end, price, basePrice: bp, note, created: new Date().toLocaleDateString('vi-VN') });
+  save(); renderCalendar(); renderBlist(); renderStats(); runChecker(); resetForm();
+  closeBookingDrawer();
+  toast(`✓ Đã đặt ${selCam} cho ${name}`);
+}
+
+function deleteBooking(id) {
+  bookings = bookings.filter(b => b.id !== id);
+  save(); renderCalendar(); renderBlist(); renderStats(); runChecker();
+  toast('Đã xóa lịch thuê');
+}
+
+function save() { localStorage.setItem('hanabook5', JSON.stringify(bookings)); }
+
+function resetForm() {
+  ['f-name','f-phone','f-note'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-discount').value = '';
+  document.querySelectorAll('.cam-opt,.rrow,.ca-opt').forEach(e => e.classList.remove('sel'));
+  selCam = null; selRental = null; selCas.clear();
+  document.getElementById('p-val').textContent = '—';
+  document.getElementById('p-sub').textContent = 'Chọn máy & hình thức';
+  document.getElementById('p-disc').textContent = '';
+  document.getElementById('f-end').value = '';
+  document.getElementById('f-end').style.opacity = '.45';
+  document.getElementById('ca-sec').classList.remove('vis');
+  document.getElementById('ca-cnt').textContent = '';
+  document.getElementById('ca-pre').textContent = '';
+  RT.forEach(r => { const e = document.getElementById('rp-' + r.key); if (e) e.textContent = '—'; });
+  document.getElementById('f-start').value = todayStr();
+}
+
+// ═══ CALENDAR ═══
+function renderCalendar() {
+  const cal = document.getElementById('cal');
+  const y = curMonth.getFullYear(), m = curMonth.getMonth();
+  document.getElementById('month-lbl').textContent = `Tháng ${m + 1}, ${y}`;
+  const days = ['T2','T3','T4','T5','T6','T7','CN'];
+  let html = days.map(d => `<div class="cal-dh">${d}</div>`).join('');
+  const lastDay = new Date(y, m + 1, 0).getDate(), today = todayStr();
+  let dow = new Date(y, m, 1).getDay(); dow = dow === 0 ? 6 : dow - 1;
+  for (let i = 0; i < dow; i++) html += cellHtml(new Date(y, m, -dow + i + 1), true, today);
+  for (let d = 1; d <= lastDay; d++) html += cellHtml(new Date(y, m, d), false, today);
+  const tot = Math.ceil((dow + lastDay) / 7) * 7;
+  for (let i = 1; i <= tot - dow - lastDay; i++) html += cellHtml(new Date(y, m + 1, i), true, today);
+  cal.innerHTML = html;
+}
+
+function cellHtml(date, other, today) {
+  const ds = date.toISOString().split('T')[0];
+  const isToday = ds === today;
+  const bs = bookingsForDate(ds);
+  const deliveries = bookings.filter(b => b.start === ds);
+  const dflag = deliveries.length > 0 ? `<div class="deliver-flag" title="${deliveries.map(b => b.camera + '→' + b.name).join(', ')}">📦</div>` : '';
+
+  // Show free cameras as small tags
+  const busyCamsToday = new Set(bs.map(b => b.camera));
+  const freeCams = CAMS.filter(c => !busyCamsToday.has(c));
+  const freeTags = freeCams.length > 0 && freeCams.length < 4
+    ? `<div class="cal-free-cams">${freeCams.map(c => `<span class="free-cam-tag" style="color:${CT[c]};border-color:${CT[c]};opacity:.6">${c}</span>`).join('')}</div>`
+    : freeCams.length === 4
+      ? `<div class="cal-free-cams"><span class="free-cam-tag" style="color:var(--success);border-color:var(--success);opacity:.6">Tất cả trống</span></div>`
+      : '';
+
+  // Booking pills
+  let pills = bs.slice(0, 2).map(b => {
+    const lbl = b.rental === 'ca' ? b.cas.map(c => CAI[c].icon).join('') + ' ' + b.name : b.name;
+    const hasNote = b.note && b.note.trim() !== '';
+    const ttContent = hasNote ? `<div class="tt-box"><div class="tt-head">${b.camera} · ${b.name}</div><div class="tt-note">${b.note}</div></div>` : '';
+    return `<div class="cpill tt-wrap ${PCLS[b.camera]}" onclick="openModal('${b.id}')">
+      <div class="cpill-dot" style="background:${CT[b.camera]};opacity:.7"></div>
+      <span style="overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0">${lbl}</span>
+      ${hasNote ? '<span style="font-size:8px;flex-shrink:0">⚠</span>' : ''}
+      ${ttContent}
+    </div>`;
+  }).join('');
+  if (bs.length > 2) pills += `<div class="cpill-more">+${bs.length - 2} khác</div>`;
+
+  return `<div class="cal-cell${other ? ' other' : ''}${isToday ? ' today' : ''}">
+    ${dflag}
+    <div class="cal-daynum">${date.getDate()}</div>
+    ${freeTags}
+    ${pills}
+  </div>`;
+}
+
+document.addEventListener('mouseover', function(e) {
+  const pill = e.target.closest('.cpill.tt-wrap');
+  if (!pill) return;
+  const tt = pill.querySelector('.tt-box'); if (!tt) return;
+  const r = pill.getBoundingClientRect();
+  tt.style.left = r.left + 'px';
+  tt.style.top = (r.top - 8) + 'px';
+  tt.style.transform = 'translateY(-100%)';
+});
+
+function bookingsForDate(ds) { return bookings.filter(b => ds >= b.start && ds <= b.end); }
+function changeMonth(d) { curMonth.setMonth(curMonth.getMonth() + d); renderCalendar(); }
+function goToday() { curMonth = new Date(); renderCalendar(); }
+
+// ═══ AVAILABILITY CHECKER ═══
+function runChecker() {
+  const from  = document.getElementById('ck-from').value;
+  const to    = document.getElementById('ck-to').value;
+  const rtype = document.getElementById('ck-type').value;
+  const el    = document.getElementById('ck-results');
+
+  if (!from || !to) {
+    el.innerHTML = `<div class="checker-hint">Chọn khoảng ngày để kiểm tra</div>`;
+    return;
+  }
+
+  if (from > to) {
+    el.innerHTML = `<div class="checker-hint" style="color:var(--danger)">Ngày bắt đầu phải trước ngày kết thúc</div>`;
+    return;
+  }
+
+  // Count days in range
+  const dFrom = new Date(from), dTo = new Date(to);
+  const days  = Math.round((dTo - dFrom) / 86400000) + 1;
+
+  const rtInfo = RTYPE_PRICE[rtype];
+
+  const results = CAMS.map(cam => {
+    // is this camera free for entire date range?
+    const isBusy = bookings.some(b => b.camera === cam && !(to < b.start || from > b.end));
+
+    // pricing
+    let unitPrice, totalPrice, priceDetail;
+    if (rtype === 'ca') {
+      unitPrice   = CA_RATE[cam];
+      totalPrice  = null; // per-ca pricing — no total without knowing # of cas
+      priceDetail = `${fmtVND(unitPrice)} / ca`;
+    } else if (rtype === 'ngay') {
+      unitPrice   = DAY_RATE[cam];
+      totalPrice  = unitPrice * days;
+      priceDetail = `${fmtVND(unitPrice)} × ${days} ngày`;
+    } else if (rtype === 'n3') {
+      unitPrice   = PRICE[cam].n3;
+      const sets  = Math.ceil(days / 3);
+      totalPrice  = unitPrice * sets;
+      priceDetail = `${fmtVND(unitPrice)} / 3 ngày${sets > 1 ? ' × ' + sets : ''}`;
+    } else { // n5
+      unitPrice   = PRICE[cam].n5;
+      const sets  = Math.ceil(days / 5);
+      totalPrice  = unitPrice * sets;
+      priceDetail = `${fmtVND(unitPrice)} / 5 ngày${sets > 1 ? ' × ' + sets : ''}`;
+    }
+
+    return { cam, isBusy, unitPrice, totalPrice, priceDetail, days };
+  });
+
+  el.innerHTML = `<div class="avail-results">` + results.map(r => {
+    const sc = r.isBusy ? 'var(--danger)' : 'var(--success)';
+    const sb = r.isBusy ? 'rgba(168,80,80,.08)' : 'rgba(90,158,122,.08)';
+    const statusTxt = r.isBusy ? 'Đã có lịch' : 'Trống';
+
+    const pricingHtml = !r.isBusy ? `
+      <div class="acard-pricing">
+        <div class="acard-price-row">
+          <span class="acard-price-label">Đơn giá</span>
+          <span class="acard-price-val">${r.priceDetail}</span>
+        </div>
+        ${r.totalPrice !== null ? `<div class="acard-total">
+          <span class="acard-total-label">Tổng ${r.days} ngày</span>
+          <span class="acard-total-val">${fmtVND(r.totalPrice)}</span>
+        </div>` : '<div class="acard-price-row"><span class="acard-price-label" style="font-style:italic">Tuỳ số ca chọn</span></div>'}
+      </div>` : `<div class="acard-price-row"><span class="acard-price-label" style="font-size:10px">Không khả dụng trong khoảng này</span></div>`;
+
+    return `<div class="avail-cam-card ${r.isBusy ? 'busy' : 'free'}">
+      <div class="acard-top">
+        <div class="acard-cam" style="color:${CT[r.cam]}">${r.cam}</div>
+        <div class="acard-status" style="color:${sc};background:${sb}">${statusTxt}</div>
+      </div>
+      ${pricingHtml}
+    </div>`;
+  }).join('') + `</div>`;
+}
+
+// ═══ BOOKING LIST ═══
+function setFilter(el, f) {
+  document.querySelectorAll('.fbtn').forEach(b => b.classList.remove('on'));
+  el.classList.add('on'); curFilter = f; renderBlist();
+}
+
+function renderBlist() {
+  const el = document.getElementById('blist');
+  let list = curFilter === 'all' ? bookings : bookings.filter(b => b.camera === curFilter);
+  list = [...list].sort((a, b) => b.start.localeCompare(a.start));
+  if (!list.length) { el.innerHTML = `<div class="empty"><div class="empty-ico">📷</div><div class="empty-txt">Chưa có lịch thuê nào</div></div>`; return; }
+  el.innerHTML = list.map(b => {
+    const dateLabel = b.start === b.end ? fmtDate(b.start) : `${fmtDate(b.start)} → ${fmtDate(b.end)}`;
+    const delC = b.delivery === 'online' ? 'rgba(184,134,58,.1)' : 'rgba(90,158,122,.1)';
+    const delTC = b.delivery === 'online' ? 'var(--warn)' : 'var(--success)';
+    const delTag = `<span class="btag" style="background:${delC};color:${delTC}">${DEL[b.delivery] || b.delivery}</span>`;
+    const noteTag = b.note ? `<span class="btag" style="background:rgba(184,134,58,.08);color:var(--warn)">⚠</span>` : '';
+    return `<div class="bcard" onclick="openModal('${b.id}')">
+      <div class="bcam" style="background:${CB[b.camera]};color:${CT[b.camera]}">${b.camera}</div>
+      <div class="binfo">
+        <div class="bname">${b.name}</div>
+        <div class="bsub">${b.phone || '—'} · ${b.chan}</div>
+        <div class="btags">${delTag}${noteTag}</div>
+      </div>
+      <div>
+        <div class="bamt">${fmtVND(b.price)}</div>
+        <div class="bdate-small">${dateLabel}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══ STATS (header pills only) ═══
+function renderStats() {
+  const today = todayStr(), ym = today.slice(0, 7);
+  const mb = bookings.filter(b => b.start.startsWith(ym));
+  const uniqueKH = new Set(mb.map(b => (b.phone || '').trim() !== '' ? b.phone : b.name)).size;
+  const deliverToday = bookings.filter(b => b.start === today);
+  const rev = mb.reduce((s, b) => s + b.price, 0);
+  document.getElementById('hp-kh').textContent  = `${uniqueKH} KH tháng này`;
+  document.getElementById('hp-del').textContent = `${deliverToday.length} giao hôm nay`;
+  document.getElementById('hp-rev').textContent = fmtVND(rev) + ' tháng này';
+}
+
+// ═══ MODAL ═══
+function openModal(id) {
+  const b = bookings.find(x => x.id === id); if (!b) return;
+  curDetailId = id;
+  document.getElementById('m-dot').style.background = CC[b.camera];
+  document.getElementById('m-cam').textContent = b.camera;
+  document.getElementById('m-cam').style.color = CT[b.camera];
+  document.getElementById('m-cust').textContent = b.name;
+  document.getElementById('m-sub').textContent = `${b.phone || 'Không có SĐT'} · ${b.chan} · Đặt ${b.created}`;
+  const sr = b.rental === 'ca' && b.cas.length > 0 ? `<div class="mrow"><span class="mk">Ca thuê</span><span class="mv">${b.cas.map(c => CAI[c].icon + ' ' + CAI[c].label).join(', ')}</span></div>` : '';
+  const dr = b.discount > 0 ? `<div class="mrow"><span class="mk">Chiết khấu</span><span class="mv" style="color:var(--success)">${b.discount}% (tiết kiệm ${fmtVND(b.basePrice - b.price)})</span></div>` : '';
+  const noteBox = b.note ? `<div class="m-note"><div class="m-note-lbl">⚠ Yêu cầu đặc biệt</div><div class="m-note-txt">${b.note}</div></div>` : '';
+  document.getElementById('m-body').innerHTML = `
+    <div class="mrow"><span class="mk">Máy ảnh</span><span class="mv" style="color:${CT[b.camera]}">${b.camera}</span></div>
+    <div class="mrow"><span class="mk">Hình thức thuê</span><span class="mv">${b.rentalLabel}</span></div>
+    ${sr}
+    <div class="mrow"><span class="mk">Thời gian</span><span class="mv">${fmtDate(b.start)}${b.start !== b.end ? ' → ' + fmtDate(b.end) : ''}</span></div>
+    <div class="mrow"><span class="mk">Giao máy</span><span class="mv">${DEL[b.delivery] || b.delivery}</span></div>
+    <div class="mrow"><span class="mk">Hình thức cọc</span><span class="mv">${DEP[b.deposit] || b.deposit}</span></div>
+    ${dr}
+    <div class="mrow"><span class="mk">Tổng tiền</span><span class="mv" style="font-size:14px">${fmtVND(b.price)}</span></div>
+    ${noteBox}`;
+
+  document.getElementById('m-del-btn').onclick = () => { deleteBooking(id); closeModal(); };
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() { document.getElementById('modal').classList.remove('open'); curDetailId = null; }
+document.getElementById('modal').addEventListener('click', e => { if (e.target === document.getElementById('modal')) closeModal(); });
+
+// ═══ UTILS ═══
+function fmtVND(n) { return Math.round(n).toLocaleString('vi-VN') + 'đ'; }
+function fmtDate(ds) { if (!ds) return '—'; const [y, m, d] = ds.split('-'); return `${d}/${m}/${y}`; }
+function toast(msg, isErr = false) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.background = isErr ? 'var(--danger)' : 'var(--success)';
+  el.style.color = '#fff';
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+init();
+</script>
+</body>
+</html>
