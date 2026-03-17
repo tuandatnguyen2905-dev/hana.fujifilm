@@ -450,7 +450,7 @@ body{font-family:'Mulish',sans-serif;background:var(--pearl);color:var(--warm-da
     <div class="hpills">
       <div class="sync-pill" onclick="openSetup()" title="Trạng thái đồng bộ — nhấn để cài đặt">
         <div class="sync-dot local" id="sync-dot"></div>
-        <span id="sync-lbl">Cục bộ</span>
+        <span id="sync-lbl">Offline</span>
       </div>
       <div class="hpill"><div class="hpdot" style="background:var(--cam-xs20)"></div><span id="hp-kh">0 KH tháng này</span></div>
       <div class="hpill"><div class="hpdot" style="background:var(--warn)"></div><span id="hp-del">0 giao hôm nay</span></div>
@@ -785,40 +785,35 @@ body{font-family:'Mulish',sans-serif;background:var(--pearl);color:var(--warm-da
 <!-- ══ SETUP MODAL ══ -->
 <div class="setup-overlay" id="setup-overlay" onclick="if(event.target===this)closeSetup()">
   <div class="setup-box">
-    <div class="setup-title">Đồng bộ qua GitHub Gist</div>
-    <div class="setup-sub">Lưu dữ liệu vào GitHub Gist — miễn phí, đồng bộ tức thì giữa mọi thiết bị. Chỉ cần tài khoản GitHub.</div>
+    <div class="setup-title">Đồng bộ qua Google Apps Script</div>
+    <div class="setup-sub">Dùng Google Sheets làm database — miễn phí, tất cả thiết bị chỉ cần 1 URL duy nhất, tự đồng bộ mỗi 30 giây.</div>
 
     <div class="setup-step">
       <div class="step-num">1</div>
-      <div class="step-txt">Vào <strong>github.com → Settings → Developer settings → Personal access tokens → Tokens (classic)</strong> → Nhấn <code>Generate new token</code> → Tích vào quyền <code>gist</code> → Generate → Sao chép token</div>
+      <div class="step-txt">Mở <strong>script.google.com</strong> → Nhấn <strong>New project</strong> → Xóa code mặc định → Dán code bên dưới vào → Nhấn 💾 Save</div>
+    </div>
+
+    <div class="setup-gas-code" id="gas-code-display" style="max-height:160px"></div>
+    <button class="copy-btn" onclick="copyGasCode()">📋 Sao chép code</button>
+
+    <div class="setup-step" style="margin-top:14px">
+      <div class="step-num">2</div>
+      <div class="step-txt">Nhấn <code>Deploy</code> → <code>New deployment</code> → Nhấn ⚙️ chọn type <code>Web app</code> → Điền mô tả bất kỳ → <strong>Execute as: Me</strong> → <strong>Who has access: Anyone</strong> → Nhấn <code>Deploy</code> → Cấp quyền nếu được hỏi → Sao chép <strong>Web app URL</strong></div>
     </div>
 
     <div class="setup-step">
-      <div class="step-num">2</div>
-      <div class="step-txt">Dán token vào ô bên dưới. Nếu bạn chưa có Gist, để trống ô Gist ID — hệ thống sẽ tự tạo. Nếu đã có Gist từ thiết bị khác, dán Gist ID vào để dùng chung.</div>
+      <div class="step-num">3</div>
+      <div class="step-txt">Dán URL vào ô bên dưới → Nhấn <strong>Kết nối</strong>. Mọi thiết bị khác chỉ cần dán cùng URL này là xong, không cần làm lại bước 1–2.</div>
     </div>
 
-    <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
-      <div>
-        <label style="font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--taupe);text-transform:uppercase;display:block;margin-bottom:4px">Personal Access Token *</label>
-        <input class="setup-url-input" id="gas-url-input-token" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" style="width:100%">
-      </div>
-      <div>
-        <label style="font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--taupe);text-transform:uppercase;display:block;margin-bottom:4px">Gist ID <span style="font-weight:600;color:var(--stone)">(để trống nếu chưa có)</span></label>
-        <div style="display:flex;gap:8px">
-          <input class="setup-url-input" id="gas-url-input-gist" type="text" placeholder="a1b2c3d4e5f6... (tự tạo nếu để trống)" style="flex:1">
-          <button class="copy-btn" onclick="copyGasCode()" title="Sao chép Gist ID hiện tại">📋</button>
-        </div>
-      </div>
+    <div class="setup-url-row">
+      <input class="setup-url-input" id="gas-url-input" type="url" placeholder="https://script.google.com/macros/s/AKfy.../exec">
+      <button class="setup-btn" onclick="connectGAS()">Kết nối</button>
     </div>
+    <div id="setup-status" style="font-size:11px;font-weight:700;margin-top:8px;min-height:18px"></div>
 
-    <div style="margin-top:12px">
-      <button class="setup-btn" style="width:100%;padding:12px" onclick="connectGAS()">🔗 Kết nối &amp; đồng bộ</button>
-    </div>
-    <div id="setup-status" style="font-size:11px;font-weight:700;margin-top:8px;min-height:18px;text-align:center"></div>
-
-    <div style="background:var(--pearl2);border:1px solid var(--pearl3);border-radius:8px;padding:10px 12px;margin-top:10px;font-size:10px;color:var(--stone);font-weight:600;line-height:1.6">
-      💡 <strong>Dùng chung trên nhiều máy:</strong> Sau khi kết nối trên máy đầu tiên, sao chép Gist ID (nhấn 📋) → Dán vào máy thứ hai cùng với token → Nhấn Kết nối
+    <div style="background:var(--pearl2);border:1px solid var(--pearl3);border-radius:8px;padding:10px 12px;margin-top:10px;font-size:10px;color:var(--stone);font-weight:600;line-height:1.7">
+      💡 <strong>Dùng chung nhiều thiết bị:</strong> Chỉ cần sao chép URL và dán vào từng thiết bị → Kết nối. Tất cả sẽ tự đồng bộ dữ liệu với nhau.
     </div>
 
     <button class="setup-skip" onclick="closeSetup()">✕ Đóng (tiếp tục dùng cục bộ)</button>
@@ -919,7 +914,7 @@ function init() {
   runChecker();
   // Init sync status
   if(gasUrl){ setSyncStatus('syncing','Đang tải...'); startAutoSync(); }
-  else setSyncStatus('local','Cục bộ');
+  else setSyncStatus('local','Offline');
 }
 
 // ════ UTILS ════
@@ -934,89 +929,148 @@ function save() {
 }
 
 // ════ GAS SYNC ════
-// ════ GITHUB GIST SYNC ════
-// gasUrl here actually = gist config JSON: { gistId, token }
-// We reuse gasUrl variable name for compatibility
+// ════ GOOGLE APPS SCRIPT SYNC ════
+
+const GAS_CODE = `// ═══════════════════════════════════════
+// hana.fujifilm — Google Apps Script Backend
+// 1. Mở script.google.com → New project
+// 2. Xóa code mặc định, dán code này vào
+// 3. Deploy → New deployment → Web app
+//    Execute as: Me | Access: Anyone
+// 4. Copy URL → Dán vào app
+// ═══════════════════════════════════════
+
+const SHEET_NAME = 'HanaData';
+
+function doGet(e) {
+  const action = e.parameter.action;
+  if(action === 'pull') return pull();
+  return ok({error:'unknown action'});
+}
+
+function doPost(e) {
+  try {
+    const data = JSON.parse(e.postData.contents);
+    if(data.action === 'push')         return push(data);
+    if(data.action === 'pushSettings') return pushSettings(data);
+    return ok({error:'unknown action'});
+  } catch(err) {
+    return ok({error: err.toString()});
+  }
+}
+
+function getSheet() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sh = ss.getSheetByName(SHEET_NAME);
+  if(!sh) {
+    sh = ss.insertSheet(SHEET_NAME);
+    sh.getRange('A1:F1').setValues([['bookings','ts','pricing','machines','cams','bufferFee']]);
+  }
+  return sh;
+}
+
+function pull() {
+  const sh  = getSheet();
+  const row = sh.getRange('A2:F2').getValues()[0];
+  return ok({
+    bookings:  row[0] ? JSON.parse(row[0]) : [],
+    ts:        row[1] || 0,
+    pricing:   row[2] ? JSON.parse(row[2]) : null,
+    machines:  row[3] ? JSON.parse(row[3]) : null,
+    cams:      row[4] ? JSON.parse(row[4]) : null,
+    bufferFee: row[5] ? JSON.parse(row[5]) : null,
+  });
+}
+
+function push(data) {
+  const sh = getSheet();
+  const ts = Date.now();
+  sh.getRange('A2').setValue(JSON.stringify(data.bookings));
+  sh.getRange('B2').setValue(ts);
+  return ok({ts});
+}
+
+function pushSettings(data) {
+  const sh = getSheet();
+  if(data.pricing)   sh.getRange('C2').setValue(JSON.stringify(data.pricing));
+  if(data.machines)  sh.getRange('D2').setValue(JSON.stringify(data.machines));
+  if(data.cams)      sh.getRange('E2').setValue(JSON.stringify(data.cams));
+  if(data.bufferFee) sh.getRange('F2').setValue(JSON.stringify(data.bufferFee));
+  return ok({ok:true});
+}
+
+function ok(obj) {
+  return ContentService
+    .createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}`;
 
 function setSyncStatus(state, label) {
   const dot = document.getElementById('sync-dot');
   const lbl = document.getElementById('sync-lbl');
-  if(dot) dot.className='sync-dot '+state;
+  if(dot) dot.className = 'sync-dot ' + state;
   if(lbl) lbl.textContent = label;
-}
-
-function getGistConfig() {
-  try { return JSON.parse(gasUrl || 'null'); } catch(e) { return null; }
 }
 
 function schedulePush() {
   clearTimeout(syncTimer);
-  syncTimer = setTimeout(pushToGist, 800);
+  syncTimer = setTimeout(pushToGAS, 800);
 }
 
-async function pushToGist() {
-  const cfg = getGistConfig();
-  if(!cfg) return;
-  setSyncStatus('syncing','Đang lưu...');
+async function pushToGAS() {
+  if(!gasUrl) return;
+  setSyncStatus('syncing', 'Đang lưu...');
   try {
-    const payload = {
-      bookings, pricing, machines,
-      cams: CAMS, bufferFee,
-      ts: Date.now()
-    };
-    const res = await fetch(`https://api.github.com/gists/${cfg.gistId}`, {
-      method: 'PATCH',
-      headers: {
-        'Authorization': `token ${cfg.token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        files: { 'hana_data.json': { content: JSON.stringify(payload) } }
-      })
+    const res = await fetch(gasUrl, {
+      method: 'POST',
+      body: JSON.stringify({ action:'push', bookings }),
+      headers: { 'Content-Type': 'text/plain' }
     });
-    if(res.ok) {
-      lastSyncTs = Date.now();
-      setSyncStatus('ok', fmtSyncTime(lastSyncTs));
+    const d = await res.json();
+    if(d.ts) {
+      lastSyncTs = d.ts;
+      setSyncStatus('ok', fmtSyncTime(d.ts));
     } else {
-      setSyncStatus('err','Lỗi lưu');
+      setSyncStatus('err', 'Lỗi lưu');
     }
   } catch(e) {
-    setSyncStatus('err','Mất kết nối');
+    setSyncStatus('err', 'Mất kết nối');
   }
 }
 
 async function pushSettingsToGAS() {
-  // Settings are bundled in the main push for Gist
-  schedulePush();
+  if(!gasUrl) return;
+  try {
+    await fetch(gasUrl, {
+      method: 'POST',
+      body: JSON.stringify({ action:'pushSettings', pricing, machines, cams:CAMS, bufferFee }),
+      headers: { 'Content-Type': 'text/plain' }
+    });
+  } catch(e) { /* silent */ }
 }
 
 async function pullFromGAS() {
-  const cfg = getGistConfig();
-  if(!cfg) { setSyncStatus('local','Cục bộ'); return; }
-  setSyncStatus('syncing','Đang tải...');
+  if(!gasUrl) { setSyncStatus('local','Offline'); return; }
+  setSyncStatus('syncing', 'Đang tải...');
   try {
-    const res = await fetch(`https://api.github.com/gists/${cfg.gistId}`, {
-      headers: { 'Authorization': `token ${cfg.token}` }
-    });
-    if(!res.ok) { setSyncStatus('err','Lỗi tải'); return; }
-    const gist = await res.json();
-    const raw = gist.files?.['hana_data.json']?.content;
-    if(!raw) { setSyncStatus('ok','Trống'); return; }
-    const d = JSON.parse(raw);
+    const res = await fetch(gasUrl + '?action=pull&t=' + Date.now());
+    const d = await res.json();
     if(Array.isArray(d.bookings)) {
       bookings = d.bookings;
       localStorage.setItem('hana7_bookings', JSON.stringify(bookings));
+      if(d.pricing)            { pricing   = d.pricing;   localStorage.setItem('hana7_pricing',  JSON.stringify(pricing));   }
+      if(d.machines)           { machines  = d.machines;  localStorage.setItem('hana7_machines', JSON.stringify(machines));  }
+      if(Array.isArray(d.cams)){ CAMS      = d.cams;      localStorage.setItem('hana7_cams',     JSON.stringify(CAMS));      }
+      if(d.bufferFee)          { bufferFee = d.bufferFee; localStorage.setItem('hana7_buffee',   JSON.stringify(bufferFee)); }
+      lastSyncTs = d.ts || Date.now();
+      setSyncStatus('ok', fmtSyncTime(lastSyncTs));
+      renderCalendar(); renderHeaderStats(); refreshCamSelects(); runChecker();
+      if(adminOpen){ renderStats(); renderAdminBlist(); renderPricingSettings(); renderMachineSettings(); updateBufFeeLabel(); }
+    } else {
+      setSyncStatus('err', 'Lỗi dữ liệu');
     }
-    if(d.pricing)   { pricing=d.pricing;     localStorage.setItem('hana7_pricing',JSON.stringify(pricing)); }
-    if(d.machines)  { machines=d.machines;   localStorage.setItem('hana7_machines',JSON.stringify(machines)); }
-    if(Array.isArray(d.cams)) { CAMS=d.cams; localStorage.setItem('hana7_cams',JSON.stringify(CAMS)); }
-    if(d.bufferFee) { bufferFee=d.bufferFee; localStorage.setItem('hana7_buffee',JSON.stringify(bufferFee)); }
-    lastSyncTs = d.ts || Date.now();
-    setSyncStatus('ok', fmtSyncTime(lastSyncTs));
-    renderCalendar(); renderHeaderStats(); refreshCamSelects(); runChecker();
-    if(adminOpen){ renderStats(); renderAdminBlist(); renderPricingSettings(); renderMachineSettings(); updateBufFeeLabel(); }
   } catch(e) {
-    setSyncStatus('err','Mất kết nối');
+    setSyncStatus('err', 'Mất kết nối');
   }
 }
 
@@ -1027,79 +1081,56 @@ function fmtSyncTime(ts) {
 }
 
 function startAutoSync() {
-  const cfg = getGistConfig();
-  if(!cfg) return;
+  if(!gasUrl) return;
   pullFromGAS();
   setInterval(pullFromGAS, 30000);
 }
 
 // ════ SETUP MODAL ════
 function openSetup() {
-  const cfg = getGistConfig();
-  document.getElementById('gas-url-input-token').value = cfg?.token || '';
-  document.getElementById('gas-url-input-gist').value  = cfg?.gistId || '';
+  document.getElementById('gas-url-input').value = gasUrl || '';
   document.getElementById('setup-status').textContent = '';
+  document.getElementById('gas-code-display').textContent = GAS_CODE;
   document.getElementById('setup-overlay').classList.add('open');
 }
 function closeSetup() {
   document.getElementById('setup-overlay').classList.remove('open');
 }
-
 async function connectGAS() {
-  const token  = document.getElementById('gas-url-input-token').value.trim();
-  const gistId = document.getElementById('gas-url-input-gist').value.trim();
+  const url = document.getElementById('gas-url-input').value.trim();
   const statusEl = document.getElementById('setup-status');
-
-  if(!token) { statusEl.style.color='var(--danger)'; statusEl.textContent='⚠ Nhập Personal Access Token'; return; }
-
-  statusEl.style.color='var(--warn)'; statusEl.textContent='Đang kiểm tra...';
-
+  if(!url) { statusEl.style.color='var(--danger)'; statusEl.textContent='⚠ Vui lòng nhập URL'; return; }
+  statusEl.style.color='var(--warn)'; statusEl.textContent='Đang kiểm tra kết nối...';
   try {
-    let finalGistId = gistId;
-
-    if(!finalGistId) {
-      // Create new gist
-      statusEl.textContent='Đang tạo Gist mới...';
-      const init = { bookings:[], pricing:{}, machines:{}, cams:[], bufferFee:{early:50000,late:50000}, ts:Date.now() };
-      const res = await fetch('https://api.github.com/gists', {
-        method: 'POST',
-        headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          description: 'hana.fujifilm rental data',
-          public: false,
-          files: { 'hana_data.json': { content: JSON.stringify(init) } }
-        })
-      });
-      if(!res.ok) { statusEl.style.color='var(--danger)'; statusEl.textContent='⚠ Token không hợp lệ hoặc thiếu quyền gist'; return; }
-      const g = await res.json();
-      finalGistId = g.id;
-      document.getElementById('gas-url-input-gist').value = finalGistId;
+    const res = await fetch(url + '?action=pull&t=' + Date.now());
+    const d = await res.json();
+    if(Array.isArray(d.bookings)) {
+      gasUrl = url;
+      localStorage.setItem('hana7_gas_url', gasUrl);
+      statusEl.style.color='var(--success)'; statusEl.textContent='✓ Kết nối thành công!';
+      setTimeout(() => {
+        closeSetup();
+        bookings = d.bookings;
+        localStorage.setItem('hana7_bookings', JSON.stringify(bookings));
+        setSyncStatus('ok', 'Đã đồng bộ');
+        renderCalendar(); renderHeaderStats(); runChecker();
+        if(adminOpen){ renderStats(); renderAdminBlist(); }
+        startAutoSync();
+      }, 1200);
     } else {
-      // Verify existing gist
-      const res = await fetch(`https://api.github.com/gists/${finalGistId}`, {
-        headers: { 'Authorization': `token ${token}` }
-      });
-      if(!res.ok) { statusEl.style.color='var(--danger)'; statusEl.textContent='⚠ Gist ID không tồn tại hoặc không có quyền truy cập'; return; }
+      statusEl.style.color='var(--danger)'; statusEl.textContent='⚠ URL không hợp lệ hoặc chưa deploy đúng';
     }
-
-    // Save config
-    gasUrl = JSON.stringify({ token, gistId: finalGistId });
-    localStorage.setItem('hana7_gas_url', gasUrl);
-    statusEl.style.color='var(--success)';
-    statusEl.textContent=`✓ Kết nối thành công! Gist ID: ${finalGistId}`;
-    setTimeout(()=>{ closeSetup(); startAutoSync(); }, 1400);
-
   } catch(e) {
-    statusEl.style.color='var(--danger)';
-    statusEl.textContent='⚠ Lỗi kết nối: '+e.message;
+    statusEl.style.color='var(--danger)'; statusEl.textContent='⚠ Không kết nối được — kiểm tra URL và quyền truy cập';
   }
 }
-
 function copyGasCode() {
-  const cfg = getGistConfig();
-  if(cfg?.gistId) {
-    navigator.clipboard?.writeText(cfg.gistId).then(()=>toast('✓ Đã sao chép Gist ID'));
-  }
+  navigator.clipboard?.writeText(GAS_CODE).then(() => toast('✓ Đã sao chép code')).catch(() => {
+    const el  = document.getElementById('gas-code-display');
+    const sel = window.getSelection(); const r = document.createRange();
+    r.selectNodeContents(el); sel.removeAllRanges(); sel.addRange(r);
+    toast('Bôi đen code và nhấn Ctrl+C để sao chép');
+  });
 }
 
 // ════ TABS ════
