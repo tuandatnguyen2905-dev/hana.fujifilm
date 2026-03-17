@@ -2,498 +2,646 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>hana.fujifilm — Rental Manager</title>
 <link href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400;1,500&display=swap" rel="stylesheet">
 <style>
+/* ══ RESET & VARS ══ */
 :root{
   --pearl:#f5f2ee;--pearl2:#ede9e3;--pearl3:#e4dfd8;--cream:#faf8f5;
   --silk:#d6cfc6;--stone:#b5ada4;--taupe:#8c847b;
   --warm-dark:#3d3830;--warm-mid:#5c5248;--ink:#2a2520;
   --gold:#b89a6e;--gold-dim:rgba(184,154,110,.14);--gold-border:rgba(184,154,110,.3);
-  --cam-x100v:#b07840;--cam-xs20:#4a8faa;--cam-xs10:#7a68a8;--cam-xt4:#a85050;
   --success:#5a9e7a;--warn:#b8863a;--danger:#a85050;
   --r:10px;--sh:0 2px 16px rgba(61,56,48,.08);--sh-md:0 6px 32px rgba(61,56,48,.13);
+  --tab-h:52px;--bottom-h:60px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Mulish',sans-serif;background:var(--pearl);color:var(--warm-dark);min-height:100vh;overflow-x:hidden}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Mulish',sans-serif;background:var(--pearl);color:var(--warm-dark);-webkit-tap-highlight-color:transparent}
 
-/* ── TABS BAR ── */
-.app-tabs{display:flex;align-items:center;justify-content:space-between;background:var(--cream);border-bottom:1px solid var(--pearl3);padding:0 28px;height:56px;position:sticky;top:0;z-index:300;box-shadow:0 1px 10px rgba(61,56,48,.06)}
-.tabs-left{display:flex;align-items:center}
-.logo-script{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:400;font-size:21px;color:var(--warm-dark);letter-spacing:.5px;line-height:1;margin-right:22px}
-.logo-script em{color:var(--gold);font-style:italic}
-.tab-btn{background:none;border:none;border-bottom:2px solid transparent;padding:0 14px;height:56px;font-family:'Mulish',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--stone);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px}
+/* ══ TOP BAR ══ */
+.app-topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--cream);border-bottom:1px solid var(--pearl3);
+  padding:0 16px;height:var(--tab-h);
+  position:fixed;top:0;left:0;right:0;z-index:300;
+  box-shadow:0 1px 10px rgba(61,56,48,.06);
+}
+.topbar-logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:400;font-size:20px;color:var(--warm-dark);letter-spacing:.5px;line-height:1}
+.topbar-logo em{color:var(--gold);font-style:italic}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.hpills{display:flex;gap:5px}
+.hpill{display:flex;align-items:center;gap:4px;background:var(--pearl2);border:1px solid var(--pearl3);padding:3px 9px;border-radius:999px;font-size:10px;font-weight:700;color:var(--warm-mid);white-space:nowrap}
+.hpdot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.btn-new{display:flex;align-items:center;gap:5px;background:var(--warm-dark);color:var(--cream);border:none;padding:7px 13px;border-radius:var(--r);font-family:'Mulish',sans-serif;font-size:10px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn-new:hover{background:var(--ink)}
+.btn-new svg{flex-shrink:0}
+
+/* ══ BOTTOM NAV (mobile) ══ */
+.bottom-nav{
+  display:none;position:fixed;bottom:0;left:0;right:0;height:var(--bottom-h);
+  background:var(--cream);border-top:1px solid var(--pearl3);
+  box-shadow:0 -2px 12px rgba(61,56,48,.07);z-index:300;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.bottom-nav-inner{display:flex;height:100%}
+.bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;font-family:'Mulish',sans-serif;color:var(--stone);transition:color .15s;padding:0}
+.bnav-btn.active{color:var(--warm-dark)}
+.bnav-icon{font-size:18px;line-height:1}
+.bnav-lbl{font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase}
+.bnav-btn.active .bnav-lbl{color:var(--gold)}
+
+/* Desktop tab bar */
+.desktop-tabs{display:flex;align-items:center;gap:0;margin-left:10px}
+.tab-btn{background:none;border:none;border-bottom:2.5px solid transparent;padding:0 13px;height:var(--tab-h);font-family:'Mulish',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--stone);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px}
 .tab-btn:hover{color:var(--warm-dark)}
 .tab-btn.active{color:var(--warm-dark);border-bottom-color:var(--gold)}
-.tabs-right{display:flex;align-items:center;gap:8px}
-.hpills{display:flex;gap:6px}
-.hpill{display:flex;align-items:center;gap:5px;background:var(--pearl2);border:1px solid var(--pearl3);padding:4px 11px;border-radius:999px;font-size:11px;font-weight:600;color:var(--warm-mid)}
-.hpdot{width:6px;height:6px;border-radius:50%}
-.btn-new{display:flex;align-items:center;gap:6px;background:var(--warm-dark);color:var(--cream);border:none;padding:7px 16px;border-radius:var(--r);font-family:'Mulish',sans-serif;font-size:10px;font-weight:900;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s}
-.btn-new:hover{background:var(--ink);box-shadow:0 4px 16px rgba(42,37,32,.18);transform:translateY(-1px)}
 
-/* ── TAB PAGES ── */
-.tab-page{display:none}
-.tab-page.active{display:block}
+/* ══ MAIN LAYOUT ══ */
+.app-body{
+  position:fixed;top:var(--tab-h);left:0;right:0;
+  bottom:0;overflow:hidden;
+}
+.tab-page{display:none;height:100%;overflow:hidden}
+.tab-page.active{display:flex;flex-direction:column}
 
 /* ══ CALENDAR TAB ══ */
-.cal-wrap{display:grid;grid-template-columns:1fr 290px;height:calc(100vh - 56px);overflow:hidden}
+.cal-layout{display:flex;height:100%;overflow:hidden}
 
-/* calendar panel */
-.cal-panel{overflow-y:auto;padding:22px 26px}
+/* Calendar panel */
+.cal-panel{flex:1;overflow-y:auto;padding:16px 16px;min-width:0}
 .cal-panel::-webkit-scrollbar{width:3px}
 .cal-panel::-webkit-scrollbar-thumb{background:var(--silk);border-radius:2px}
-.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.cal-nav-l{display:flex;align-items:center;gap:9px}
-.nav-btn{background:var(--cream);border:1px solid var(--pearl3);color:var(--taupe);width:30px;height:30px;border-radius:7px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'Mulish',sans-serif;box-shadow:var(--sh)}
-.nav-btn:hover{border-color:var(--gold);color:var(--gold)}
-.month-lbl{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;font-weight:400;color:var(--warm-dark);min-width:150px}
-.today-btn{font-family:'Mulish',sans-serif;font-style:normal;font-size:9px;font-weight:900;letter-spacing:1.5px;padding:0 10px;width:auto;text-transform:uppercase}
-.legend{display:flex;gap:10px;flex-wrap:wrap}
-.leg-i{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:var(--stone)}
-.leg-d{width:7px;height:7px;border-radius:2px}
 
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.cal-nav-l{display:flex;align-items:center;gap:8px}
+.nav-btn{background:var(--cream);border:1px solid var(--pearl3);color:var(--taupe);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;box-shadow:var(--sh)}
+.nav-btn:hover{border-color:var(--gold);color:var(--gold)}
+.nav-btn:active{transform:scale(.94)}
+.month-lbl{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:19px;font-weight:400;color:var(--warm-dark);min-width:130px}
+.today-btn{font-size:9px;font-weight:900;letter-spacing:1.2px;padding:0 10px;width:auto;text-transform:uppercase}
+.legend{display:flex;gap:8px;flex-wrap:wrap}
+.leg-i{display:flex;align-items:center;gap:3px;font-size:10px;font-weight:600;color:var(--stone)}
+.leg-d{width:7px;height:7px;border-radius:2px;flex-shrink:0}
+
+/* Calendar grid */
 .cal{border:1px solid var(--pearl3);border-radius:12px;overflow:hidden;background:var(--pearl3);gap:1px;display:grid;grid-template-columns:repeat(7,1fr);box-shadow:var(--sh)}
-.cal-dh{background:var(--cream);padding:9px 4px;text-align:center;font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--stone)}
-.cal-cell{background:var(--cream);min-height:108px;padding:6px 5px 4px;position:relative;display:flex;flex-direction:column;gap:2px;transition:background .1s}
+.cal-dh{background:var(--cream);padding:8px 2px;text-align:center;font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--stone)}
+.cal-cell{background:var(--cream);min-height:90px;padding:5px 4px 3px;position:relative;display:flex;flex-direction:column;gap:2px;cursor:pointer;transition:background .1s}
 .cal-cell:hover{background:var(--pearl2)}
+.cal-cell:active{background:var(--pearl3)}
 .cal-cell.today{background:#fdf9f2}
-.cal-cell.other{background:var(--pearl);opacity:.38}
-.cal-daynum{font-size:11px;font-weight:800;color:var(--stone);margin-bottom:2px;flex-shrink:0}
+.cal-cell.other{background:var(--pearl);opacity:.35}
+.cal-daynum{font-size:11px;font-weight:800;color:var(--stone);margin-bottom:1px;flex-shrink:0;line-height:1}
 .cal-cell.today .cal-daynum{color:var(--gold)}
 .cal-cell.today .cal-daynum::after{content:'•';margin-left:2px;color:var(--gold)}
-.deliver-flag{position:absolute;top:4px;right:4px;font-size:10px;line-height:1}
+.deliver-flag{position:absolute;top:3px;right:3px;font-size:9px;line-height:1}
 
-/* free cam tags */
-.cal-free{display:flex;flex-wrap:wrap;gap:2px;margin-bottom:2px}
-.free-tag{font-size:8px;font-weight:800;padding:1px 4px;border-radius:3px;border:1px solid currentColor;opacity:.6;letter-spacing:.2px}
+.cal-free{display:flex;flex-wrap:wrap;gap:2px;margin-bottom:1px}
+.free-tag{font-size:7px;font-weight:800;padding:1px 3px;border-radius:3px;border:1px solid currentColor;opacity:.6;letter-spacing:.1px}
 
-/* booking pills */
-.cpill{display:flex;align-items:center;gap:3px;padding:2px 5px;border-radius:4px;font-size:9px;font-weight:800;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:opacity .15s;flex-shrink:0;position:relative}
+.cpill{display:flex;align-items:center;gap:2px;padding:2px 4px;border-radius:4px;font-size:8px;font-weight:800;cursor:pointer;overflow:hidden;white-space:nowrap;transition:opacity .15s;flex-shrink:0;position:relative;max-width:100%}
 .cpill:hover{opacity:.72}
-.cpill.buffer{opacity:.5;background:transparent!important;border:1px dashed currentColor}
+.cpill:active{opacity:.5}
+.cpill.buffer{opacity:.45;background:transparent!important;border:1px dashed currentColor}
 .cpill-dot{width:3px;height:3px;border-radius:50%;flex-shrink:0}
-.cpill-more{font-size:9px;font-weight:700;color:var(--stone)}
+.cpill-more{font-size:8px;font-weight:700;color:var(--stone)}
+.cpill-text{overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
 
-/* tooltip */
-.tt-wrap{position:relative}
-.tt-box{display:none;position:fixed;background:var(--cream);border:1px solid var(--pearl3);border-radius:var(--r);padding:9px 12px;min-width:170px;max-width:230px;z-index:999;box-shadow:var(--sh-md);pointer-events:none;font-size:11px}
-.tt-wrap:hover .tt-box{display:block}
+/* tooltip — hide on mobile */
+.tt-box{display:none;position:fixed;background:var(--cream);border:1px solid var(--pearl3);border-radius:var(--r);padding:9px 12px;min-width:160px;max-width:220px;z-index:999;box-shadow:var(--sh-md);pointer-events:none;font-size:11px}
+@media(hover:hover){.cpill:hover .tt-box{display:block}}
 .tt-head{font-size:9px;font-weight:800;letter-spacing:1px;color:var(--stone);text-transform:uppercase;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid var(--pearl3)}
 .tt-note{font-size:10px;line-height:1.4;color:var(--warn);background:rgba(184,134,58,.07);border-left:2px solid var(--warn);padding:3px 6px;border-radius:0 4px 4px 0;margin-top:3px}
 
-/* pill colour helpers */
-.px{background:rgba(176,120,64,.13);color:#7a5020}
-.ps{background:rgba(74,143,170,.13);color:#2a6a84}
-.pt{background:rgba(122,104,168,.13);color:#4a3888}
-.pf{background:rgba(168,80,80,.13);color:#882828}
-
-/* ── RIGHT PANEL (checker) ── */
-.right-panel{background:var(--cream);border-left:1px solid var(--pearl3);overflow-y:auto;display:flex;flex-direction:column}
+/* ══ RIGHT PANEL — checker (desktop sidebar) ══ */
+.right-panel{
+  width:270px;flex-shrink:0;background:var(--cream);
+  border-left:1px solid var(--pearl3);overflow-y:auto;
+  display:flex;flex-direction:column;
+}
 .right-panel::-webkit-scrollbar{width:3px}
 .right-panel::-webkit-scrollbar-thumb{background:var(--silk);border-radius:2px}
-.panel-section{padding:18px 16px;border-bottom:1px solid var(--pearl3)}
-.ptitle{font-size:9px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:var(--stone);margin-bottom:12px}
+.panel-section{padding:14px 13px;border-bottom:1px solid var(--pearl3)}
+.ptitle{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--stone);margin-bottom:10px}
 
-/* checker */
-.ck-type-row{display:flex;gap:6px;margin-bottom:10px}
+/* checker controls */
+.ck-type-row{display:flex;gap:5px;margin-bottom:9px}
 .ck-tb{flex:1;background:var(--pearl);border:1.5px solid var(--pearl3);color:var(--taupe);padding:7px 4px;border-radius:var(--r);font-family:'Mulish',sans-serif;font-size:10px;font-weight:800;cursor:pointer;text-align:center;transition:all .15s}
 .ck-tb.on{border-color:var(--gold);color:var(--warm-dark);background:var(--gold-dim)}
 .ck-df label{display:block;font-size:9px;font-weight:800;letter-spacing:.5px;color:var(--taupe);text-transform:uppercase;margin-bottom:3px}
-.ck-df input,.ck-df select{width:100%;background:var(--pearl);border:1px solid var(--pearl3);color:var(--warm-dark);padding:7px 9px;border-radius:8px;font-family:'Mulish',sans-serif;font-size:11px;font-weight:500;outline:none;transition:border-color .2s}
-.ck-df input:focus,.ck-df select:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim)}
-.ck-dates{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
-.ck-ca-row{margin-bottom:8px}
-.ck-cas{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
-.ca-btn{background:var(--pearl);border:1.5px solid var(--pearl3);border-radius:var(--r);padding:7px 4px;cursor:pointer;text-align:center;transition:all .15s}
-.ca-btn:hover{border-color:var(--silk)}
+.ck-df input,.ck-df select{width:100%;background:var(--pearl);border:1px solid var(--pearl3);color:var(--warm-dark);padding:7px 8px;border-radius:8px;font-family:'Mulish',sans-serif;font-size:11px;font-weight:500;outline:none;transition:border-color .2s}
+.ck-df input:focus,.ck-df select:focus{border-color:var(--gold)}
+.ck-dates{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:7px}
+.ck-cas{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:7px}
+.ca-btn{background:var(--pearl);border:1.5px solid var(--pearl3);border-radius:8px;padding:6px 3px;cursor:pointer;text-align:center;transition:all .15s}
 .ca-btn.on{border-color:var(--gold);background:var(--gold-dim)}
-.ca-btn-icon{font-size:13px;margin-bottom:1px}
-.ca-btn-name{font-size:9px;font-weight:800;color:var(--taupe)}
+.ca-btn-icon{font-size:12px;margin-bottom:1px}
+.ca-btn-name{font-size:8px;font-weight:800;color:var(--taupe)}
+.ca-btn-time{font-size:7px;color:var(--stone)}
 .ca-btn.on .ca-btn-name{color:var(--warm-dark)}
-.ca-btn-time{font-size:8px;color:var(--stone)}
-.ck-summary{background:var(--pearl2);border-radius:8px;padding:8px 10px;margin-bottom:8px;font-size:11px;color:var(--taupe);font-weight:600;min-height:30px}
-.ck-days-hi{font-weight:900;color:var(--warm-dark);font-size:13px}
-.acard{border:1px solid var(--pearl3);border-radius:var(--r);padding:9px 11px;margin-bottom:5px;transition:all .15s}
-.acard.free{background:var(--pearl)}
-.acard.busy{background:var(--pearl);opacity:.42}
-.acard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
-.acard-cam{font-size:12px;font-weight:900}
-.acard-st{font-size:9px;font-weight:800;padding:2px 7px;border-radius:999px}
+.ck-summary{background:var(--pearl2);border-radius:7px;padding:7px 9px;margin-bottom:7px;font-size:10px;color:var(--taupe);font-weight:600;min-height:28px}
+.ck-days-hi{font-weight:900;color:var(--warm-dark);font-size:12px}
+
+.acard{border:1px solid var(--pearl3);border-radius:var(--r);padding:8px 10px;margin-bottom:5px}
+.acard.busy{opacity:.45}
+.acard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.acard-cam{font-size:11px;font-weight:900}
+.acard-st{font-size:9px;font-weight:800;padding:2px 6px;border-radius:999px}
 .acard-rows{display:flex;flex-direction:column;gap:2px}
-.acard-row{display:flex;justify-content:space-between;font-size:10px}
+.acard-row{display:flex;justify-content:space-between;font-size:9px}
 .acard-lbl{color:var(--stone);font-weight:600}
 .acard-val{font-weight:800;color:var(--warm-dark)}
-.acard-total{display:flex;justify-content:space-between;padding-top:4px;border-top:1px solid var(--pearl3);margin-top:3px}
-.acard-tl{font-size:11px;color:var(--taupe);font-weight:700}
-.acard-tv{font-size:13px;font-weight:900;color:var(--warm-dark)}
-.ck-hint{font-size:10px;color:var(--stone);font-weight:600;text-align:center;padding:12px 0}
+.acard-total{display:flex;justify-content:space-between;padding-top:3px;border-top:1px solid var(--pearl3);margin-top:3px}
+.acard-tl{font-size:10px;color:var(--taupe);font-weight:700}
+.acard-tv{font-size:12px;font-weight:900;color:var(--warm-dark)}
+
+/* ══ CHECKER BOTTOM SHEET (mobile) ══ */
+.checker-sheet{
+  display:none;position:fixed;bottom:0;left:0;right:0;
+  background:var(--cream);border-top:1px solid var(--pearl3);
+  border-radius:16px 16px 0 0;z-index:350;
+  box-shadow:0 -4px 24px rgba(61,56,48,.15);
+  transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
+  max-height:85vh;display:flex;flex-direction:column;
+}
+.checker-sheet.open{transform:translateY(0)}
+.sheet-handle{width:36px;height:4px;background:var(--silk);border-radius:2px;margin:10px auto 12px;flex-shrink:0}
+.sheet-scroll{overflow-y:auto;padding:0 16px 24px;flex:1}
+.sheet-scroll::-webkit-scrollbar{display:none}
 
 /* ══ BOOKING DRAWER ══ */
-.bk-overlay{display:none;position:fixed;inset:0;background:rgba(42,37,32,.38);backdrop-filter:blur(3px);z-index:400}
+.bk-overlay{display:none;position:fixed;inset:0;background:rgba(42,37,32,.4);backdrop-filter:blur(3px);z-index:400}
 .bk-overlay.open{display:block}
-.bk-drawer{position:fixed;top:0;right:0;bottom:0;width:420px;background:var(--cream);border-left:1px solid var(--pearl3);box-shadow:-8px 0 40px rgba(42,37,32,.12);z-index:401;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
+.bk-drawer{
+  position:fixed;top:0;right:0;bottom:0;
+  width:min(430px,100vw);
+  background:var(--cream);border-left:1px solid var(--pearl3);
+  box-shadow:-6px 0 32px rgba(42,37,32,.14);z-index:401;
+  display:flex;flex-direction:column;
+  transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);
+}
 .bk-overlay.open .bk-drawer{transform:translateX(0)}
-.bk-hd{display:flex;align-items:center;justify-content:space-between;padding:16px 22px 14px;border-bottom:1px solid var(--pearl3);flex-shrink:0}
-.bk-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;font-weight:400;color:var(--warm-dark)}
-.bk-close{background:none;border:1px solid var(--pearl3);color:var(--taupe);width:28px;height:28px;border-radius:7px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.bk-hd{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 12px;border-bottom:1px solid var(--pearl3);flex-shrink:0;padding-top:max(14px,env(safe-area-inset-top))}
+.bk-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:19px;font-weight:400;color:var(--warm-dark)}
+.bk-close{background:none;border:1px solid var(--pearl3);color:var(--taupe);width:30px;height:30px;border-radius:7px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .15s}
 .bk-close:hover{border-color:var(--gold);color:var(--warm-dark)}
-.bk-body{overflow-y:auto;padding:18px 22px;flex:1}
+.bk-body{overflow-y:auto;padding:14px 18px;flex:1;-webkit-overflow-scrolling:touch}
 .bk-body::-webkit-scrollbar{width:3px}
 .bk-body::-webkit-scrollbar-thumb{background:var(--silk);border-radius:2px}
-.bk-foot{padding:12px 22px;border-top:1px solid var(--pearl3);flex-shrink:0}
+.bk-foot{padding:10px 18px;border-top:1px solid var(--pearl3);flex-shrink:0;padding-bottom:max(10px,env(safe-area-inset-bottom))}
 
-/* form fields */
-.stitle{font-size:9px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:var(--stone);margin-bottom:9px}
+/* form */
 .fg{margin-bottom:9px}
 .fg label{display:block;font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--taupe);text-transform:uppercase;margin-bottom:3px}
-.fg input,.fg select,.fg textarea{width:100%;background:var(--pearl);border:1px solid var(--pearl3);color:var(--warm-dark);padding:8px 11px;border-radius:var(--r);font-family:'Mulish',sans-serif;font-size:12px;font-weight:500;outline:none;transition:border-color .2s,box-shadow .2s}
+.fg input,.fg select,.fg textarea{width:100%;background:var(--pearl);border:1px solid var(--pearl3);color:var(--warm-dark);padding:9px 11px;border-radius:var(--r);font-family:'Mulish',sans-serif;font-size:14px;font-weight:500;outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none}
 .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim)}
-.fg select option{background:var(--cream);color:var(--warm-dark)}
+.fg select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238c847b' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:28px}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 
-/* cam selector */
 .cam-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
 .cam-opt{border:1.5px solid var(--pearl3);background:var(--pearl);border-radius:var(--r);padding:9px 5px 7px;cursor:pointer;transition:all .15s;text-align:center}
-.cam-opt:hover{border-color:var(--silk)}
+.cam-opt:active{transform:scale(.96)}
 .cam-opt.sel{border-color:var(--gold);background:var(--gold-dim)}
-.cam-sw{width:7px;height:7px;border-radius:50%;margin:0 auto 4px}
-.cam-lbl{font-size:9px;font-weight:800;letter-spacing:.5px;color:var(--taupe)}
+.cam-sw{width:8px;height:8px;border-radius:50%;margin:0 auto 4px}
+.cam-lbl{font-size:9px;font-weight:800;letter-spacing:.3px;color:var(--taupe)}
 .cam-opt.sel .cam-lbl{color:var(--warm-dark)}
 
-/* rental type: ca vs ngay */
 .rent-type-row{display:flex;gap:6px;margin-bottom:9px}
-.rent-tb{flex:1;background:var(--pearl);border:1.5px solid var(--pearl3);color:var(--taupe);padding:9px 4px;border-radius:var(--r);font-family:'Mulish',sans-serif;font-size:11px;font-weight:800;cursor:pointer;text-align:center;transition:all .15s}
+.rent-tb{flex:1;background:var(--pearl);border:1.5px solid var(--pearl3);color:var(--taupe);padding:10px 4px;border-radius:var(--r);font-family:'Mulish',sans-serif;font-size:11px;font-weight:800;cursor:pointer;text-align:center;transition:all .15s}
 .rent-tb.on{border-color:var(--gold);color:var(--warm-dark);background:var(--gold-dim)}
 
-/* ca selector in form */
 .ca-sel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:9px}
-.ca-s{border:1.5px solid var(--pearl3);background:var(--pearl);border-radius:var(--r);padding:8px 4px;cursor:pointer;transition:all .15s;text-align:center}
-.ca-s:hover{border-color:var(--silk)}
+.ca-s{border:1.5px solid var(--pearl3);background:var(--pearl);border-radius:var(--r);padding:9px 4px;cursor:pointer;transition:all .15s;text-align:center}
+.ca-s:active{transform:scale(.96)}
 .ca-s.on{border-color:var(--gold);background:var(--gold-dim)}
-.ca-s-icon{font-size:14px;margin-bottom:2px}
+.ca-s-icon{font-size:15px;margin-bottom:2px}
 .ca-s-name{font-size:10px;font-weight:800;color:var(--taupe)}
 .ca-s-time{font-size:9px;color:var(--stone);margin-top:1px}
 .ca-s.on .ca-s-name{color:var(--warm-dark)}
 
-/* price tag */
-.price-tag{background:var(--pearl2);border:1px solid var(--pearl3);border-radius:8px;padding:7px 11px;font-size:11px;color:var(--taupe);font-weight:600;margin-bottom:9px;min-height:34px}
+.price-tag{background:var(--pearl2);border:1px solid var(--pearl3);border-radius:8px;padding:8px 11px;font-size:11px;color:var(--taupe);font-weight:600;margin-bottom:9px;min-height:34px;line-height:1.5}
 .price-tier{font-weight:800;color:var(--warm-dark)}
 
-/* buffer options */
-.buf-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:9px}
-.buf-opt{border:1.5px solid var(--pearl3);background:var(--pearl);border-radius:var(--r);padding:9px 10px;cursor:pointer;transition:all .15s;display:flex;align-items:flex-start;gap:8px}
-.buf-opt:hover{border-color:var(--silk)}
+.buf-row{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:7px}
+.buf-opt{border:1.5px solid var(--pearl3);background:var(--pearl);border-radius:var(--r);padding:9px 9px;cursor:pointer;transition:all .15s;display:flex;align-items:flex-start;gap:7px}
+.buf-opt:active{transform:scale(.97)}
 .buf-opt.on{border-color:var(--gold);background:var(--gold-dim)}
 .buf-chk{width:14px;height:14px;border-radius:3px;border:1.5px solid var(--silk);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:9px;color:transparent;transition:all .15s}
 .buf-opt.on .buf-chk{border-color:var(--gold);background:var(--gold);color:#fff}
-.buf-txt{font-size:10px;font-weight:700;color:var(--taupe);line-height:1.35}
+.buf-txt{font-size:10px;font-weight:700;color:var(--taupe);line-height:1.3}
 .buf-opt.on .buf-txt{color:var(--warm-dark)}
-.buf-sub{font-size:9px;font-weight:500;color:var(--stone);margin-top:2px}
-.buf-preview{font-size:10px;color:var(--taupe);font-weight:600;margin-bottom:9px;min-height:14px;line-height:1.5}
+.buf-sub{font-size:9px;font-weight:500;color:var(--stone);margin-top:1px}
+.buf-preview{font-size:10px;color:var(--taupe);font-weight:600;margin-bottom:8px;min-height:14px;line-height:1.5}
 
-/* price box */
 .pbox{background:linear-gradient(135deg,var(--pearl2),var(--pearl3));border:1px solid var(--gold-border);border-radius:var(--r);padding:11px 13px;margin-bottom:9px;display:flex;align-items:center;justify-content:space-between}
 .pbox-lbl{font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--stone)}
 .pbox-sub{font-size:10px;color:var(--taupe);margin-top:1px;font-weight:500}
-.pbox-val{font-size:18px;font-weight:900;color:var(--warm-dark);letter-spacing:-.5px}
+.pbox-val{font-size:20px;font-weight:900;color:var(--warm-dark);letter-spacing:-.5px}
 .disc-line{font-size:10px;color:var(--success);font-weight:700;margin-top:1px}
-.btn-add{width:100%;background:var(--warm-dark);color:var(--cream);border:none;padding:12px;border-radius:var(--r);font-family:'Mulish',sans-serif;font-size:10px;font-weight:900;letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;transition:all .2s}
-.btn-add:hover{background:var(--ink);box-shadow:0 4px 16px rgba(42,37,32,.2);transform:translateY(-1px)}
+.btn-add{width:100%;background:var(--warm-dark);color:var(--cream);border:none;padding:14px;border-radius:var(--r);font-family:'Mulish',sans-serif;font-size:11px;font-weight:900;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent}
+.btn-add:hover{background:var(--ink)}
+.btn-add:active{transform:scale(.98)}
 
-/* ══ DETAIL MODAL ══ */
-.moverlay{display:none;position:fixed;inset:0;background:rgba(42,37,32,.5);backdrop-filter:blur(4px);z-index:500;align-items:center;justify-content:center}
+/* ══ MODAL ══ */
+.moverlay{display:none;position:fixed;inset:0;background:rgba(42,37,32,.5);backdrop-filter:blur(4px);z-index:500;align-items:flex-end;justify-content:center;padding:0}
 .moverlay.open{display:flex}
-.modal{background:var(--cream);border:1px solid var(--pearl3);border-radius:14px;padding:22px;max-width:400px;width:92%;animation:mPop .18s ease;max-height:90vh;overflow-y:auto;box-shadow:var(--sh-md)}
-@keyframes mPop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
-.m-cam-line{display:inline-flex;align-items:center;gap:5px;font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;color:var(--stone)}
+.modal{background:var(--cream);border-radius:16px 16px 0 0;padding:20px 18px;width:100%;max-width:500px;animation:slideUp .2s ease;max-height:90vh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:max(20px,env(safe-area-inset-bottom))}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.modal-handle{width:36px;height:4px;background:var(--silk);border-radius:2px;margin:0 auto 14px}
+.m-cam-line{display:inline-flex;align-items:center;gap:5px;font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;color:var(--stone)}
 .m-cam-dot{width:7px;height:7px;border-radius:2px}
 .m-cust{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;font-weight:400;color:var(--warm-dark);margin-bottom:2px}
 .m-sub{font-size:11px;color:var(--stone);font-weight:600;margin-bottom:12px}
 .m-body{background:var(--pearl2);border-radius:var(--r);padding:12px;margin-bottom:10px;border:1px solid var(--pearl3)}
-.mrow{display:flex;justify-content:space-between;margin-bottom:6px;font-size:12px}
+.mrow{display:flex;justify-content:space-between;margin-bottom:7px;font-size:12px;gap:8px}
 .mrow:last-child{margin-bottom:0}
-.mk{color:var(--stone);font-weight:600}
-.mv{font-weight:800;color:var(--warm-dark)}
+.mk{color:var(--stone);font-weight:600;flex-shrink:0}
+.mv{font-weight:800;color:var(--warm-dark);text-align:right}
 .m-note{background:rgba(184,134,58,.06);border:1px solid rgba(184,134,58,.2);border-radius:7px;padding:9px 11px;margin-top:8px}
 .m-note-lbl{font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--warn);margin-bottom:3px}
 .m-note-txt{font-size:12px;color:var(--warm-dark);font-weight:500;line-height:1.5}
 .modal-btns{display:flex;gap:8px}
-.mbtn{flex:1;background:var(--pearl2);border:1px solid var(--pearl3);color:var(--taupe);padding:9px;border-radius:var(--r);cursor:pointer;font-family:'Mulish',sans-serif;font-size:12px;font-weight:700;transition:all .15s}
+.mbtn{flex:1;background:var(--pearl2);border:1px solid var(--pearl3);color:var(--taupe);padding:11px;border-radius:var(--r);cursor:pointer;font-family:'Mulish',sans-serif;font-size:13px;font-weight:700;transition:all .15s}
 .mbtn:hover{border-color:var(--gold);color:var(--warm-dark)}
+.mbtn:active{transform:scale(.97)}
 .mbtn-del{background:rgba(168,80,80,.07);border-color:rgba(168,80,80,.2);color:var(--danger)}
 .mbtn-del:hover{background:rgba(168,80,80,.12);border-color:var(--danger)}
 
 /* ══ ADMIN TAB ══ */
-.admin-wrap{max-width:920px;margin:0 auto;padding:30px 28px}
-.admin-lock{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:12px}
-.admin-lock-icon{font-size:38px;opacity:.28}
+.admin-page{height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.admin-page::-webkit-scrollbar{width:3px}
+.admin-page::-webkit-scrollbar-thumb{background:var(--silk);border-radius:2px}
+.admin-wrap{max-width:860px;margin:0 auto;padding:20px 14px;padding-bottom:max(20px,env(safe-area-inset-bottom))}
+
+.admin-lock{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:11px;padding:20px}
+.admin-lock-icon{font-size:36px;opacity:.25}
 .admin-lock-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;color:var(--warm-dark)}
 .admin-lock-sub{font-size:12px;color:var(--stone);font-weight:600;margin-bottom:4px}
 .admin-pw-row{display:flex;gap:8px}
-.admin-pw-row input{background:var(--pearl);border:1px solid var(--pearl3);color:var(--warm-dark);padding:9px 13px;border-radius:var(--r);font-family:'Mulish',sans-serif;font-size:13px;font-weight:500;outline:none;transition:border-color .2s;width:200px}
+.admin-pw-row input{background:var(--pearl);border:1px solid var(--pearl3);color:var(--warm-dark);padding:10px 13px;border-radius:var(--r);font-family:'Mulish',sans-serif;font-size:15px;font-weight:500;outline:none;width:200px;transition:border-color .2s;-webkit-appearance:none}
 .admin-pw-row input:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim)}
-.admin-pw-btn{background:var(--warm-dark);color:var(--cream);border:none;padding:9px 18px;border-radius:var(--r);font-family:'Mulish',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s}
+.admin-pw-btn{background:var(--warm-dark);color:var(--cream);border:none;padding:10px 18px;border-radius:var(--r);font-family:'Mulish',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s;white-space:nowrap}
 .admin-pw-btn:hover{background:var(--ink)}
 .admin-pw-err{font-size:11px;color:var(--danger);font-weight:700;display:none}
 .admin-content{display:none}
 
-.admin-section{background:var(--cream);border:1px solid var(--pearl3);border-radius:14px;padding:22px;margin-bottom:18px;box-shadow:var(--sh)}
-.admin-section-title{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--stone);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--pearl3)}
+.admin-section{background:var(--cream);border:1px solid var(--pearl3);border-radius:12px;padding:16px;margin-bottom:14px;box-shadow:var(--sh)}
+.admin-section-title{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--stone);margin-bottom:14px;padding-bottom:9px;border-bottom:1px solid var(--pearl3)}
 
-/* stats row */
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
-.stat-card{background:var(--cream);border:1px solid var(--pearl3);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh)}
-.stat-num{font-size:24px;font-weight:900;letter-spacing:-.5px;margin-bottom:2px}
+.stats-row{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-bottom:0}
+.stat-card{background:var(--pearl);border:1px solid var(--pearl3);border-radius:var(--r);padding:12px 14px}
+.stat-num{font-size:22px;font-weight:900;letter-spacing:-.5px;margin-bottom:2px}
 .stat-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--stone)}
 
-/* month picker for stats */
-.stats-ctrl{display:flex;align-items:center;gap:10px;margin-bottom:14px}
-.stats-ctrl select,.stats-ctrl input[type=month]{background:var(--pearl);border:1px solid var(--pearl3);color:var(--warm-dark);padding:7px 10px;border-radius:8px;font-family:'Mulish',sans-serif;font-size:11px;font-weight:600;outline:none;transition:border-color .2s}
-.stats-ctrl select:focus,.stats-ctrl input[type=month]:focus{border-color:var(--gold)}
+.stats-ctrl{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.stats-ctrl input[type=month]{background:var(--pearl);border:1px solid var(--pearl3);color:var(--warm-dark);padding:7px 10px;border-radius:8px;font-family:'Mulish',sans-serif;font-size:12px;font-weight:600;outline:none;-webkit-appearance:none;min-width:140px}
 
-/* settings */
-.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.sg-field label{display:block;font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--taupe);text-transform:uppercase;margin-bottom:3px}
-.sg-field input{width:100%;background:var(--pearl);border:1px solid var(--pearl3);color:var(--warm-dark);padding:8px 11px;border-radius:8px;font-family:'Mulish',sans-serif;font-size:12px;font-weight:500;outline:none;transition:border-color .2s}
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.sg-field label{display:block;font-size:9px;font-weight:800;letter-spacing:.6px;color:var(--taupe);text-transform:uppercase;margin-bottom:3px}
+.sg-field input{width:100%;background:var(--pearl);border:1px solid var(--pearl3);color:var(--warm-dark);padding:9px 10px;border-radius:8px;font-family:'Mulish',sans-serif;font-size:13px;font-weight:500;outline:none;transition:border-color .2s;-webkit-appearance:none}
 .sg-field input:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim)}
 .sg-cam-block{margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--pearl3)}
 .sg-cam-block:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0}
-.sg-cam-title{font-size:11px;font-weight:800;color:var(--warm-dark);margin-bottom:8px;display:flex;align-items:center;gap:7px}
-.sg-cam-dot{width:8px;height:8px;border-radius:3px}
-.btn-save{background:var(--warm-dark);color:var(--cream);border:none;padding:9px 20px;border-radius:var(--r);font-family:'Mulish',sans-serif;font-size:10px;font-weight:900;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .15s;margin-top:14px}
+.sg-cam-title{font-size:11px;font-weight:800;color:var(--warm-dark);margin-bottom:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.sg-cam-dot{width:8px;height:8px;border-radius:3px;flex-shrink:0}
+.btn-save{background:var(--warm-dark);color:var(--cream);border:none;padding:10px 20px;border-radius:var(--r);font-family:'Mulish',sans-serif;font-size:10px;font-weight:900;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .15s;margin-top:12px}
 .btn-save:hover{background:var(--ink)}
 
-/* booking list in admin */
-.blist-filters{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
-.fbtn{background:var(--pearl);border:1px solid var(--pearl3);color:var(--stone);padding:4px 10px;border-radius:999px;font-size:10px;font-weight:800;cursor:pointer;letter-spacing:.2px;transition:all .15s;font-family:'Mulish',sans-serif}
+.blist-filters{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:9px}
+.fbtn{background:var(--pearl);border:1px solid var(--pearl3);color:var(--stone);padding:5px 10px;border-radius:999px;font-size:10px;font-weight:800;cursor:pointer;letter-spacing:.2px;transition:all .15s;font-family:'Mulish',sans-serif;white-space:nowrap}
 .fbtn:hover,.fbtn.on{border-color:var(--gold);color:var(--warm-dark);background:var(--gold-dim)}
-.bcard{background:var(--pearl);border:1px solid var(--pearl3);border-radius:var(--r);padding:10px 12px;margin-bottom:5px;display:grid;grid-template-columns:34px 1fr auto auto;gap:9px;align-items:center;cursor:pointer;transition:all .15s;animation:fUp .18s ease both}
-@keyframes fUp{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:translateY(0)}}
+
+.bcard{background:var(--pearl);border:1px solid var(--pearl3);border-radius:var(--r);padding:10px 12px;margin-bottom:5px;display:grid;grid-template-columns:36px 1fr auto;gap:9px;align-items:center;cursor:pointer;transition:all .15s;animation:fUp .15s ease both}
+@keyframes fUp{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 .bcard:hover{border-color:var(--silk);box-shadow:var(--sh)}
-.bcam{width:34px;height:34px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:900;flex-shrink:0;text-align:center}
-.bname{font-size:12px;font-weight:800;margin-bottom:1px}
-.bsub{font-size:9px;color:var(--stone);font-weight:600}
-.btags{display:flex;gap:3px;margin-top:2px;flex-wrap:wrap}
-.btag{font-size:8px;font-weight:800;padding:1px 5px;border-radius:3px}
-.bamt{font-size:12px;font-weight:900;color:var(--warm-dark);text-align:right;white-space:nowrap}
-.bdate{font-size:9px;color:var(--stone);font-weight:600;text-align:right;white-space:nowrap;margin-top:1px}
-.empty{text-align:center;padding:28px 0;color:var(--stone)}
+.bcard:active{transform:scale(.99)}
+.bcam{width:36px;height:36px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:900;flex-shrink:0;text-align:center}
+.bname{font-size:13px;font-weight:800;margin-bottom:1px}
+.bsub{font-size:10px;color:var(--stone);font-weight:600}
+.btags{display:flex;gap:3px;margin-top:3px;flex-wrap:wrap}
+.btag{font-size:8px;font-weight:800;padding:2px 6px;border-radius:3px}
+.bamt{font-size:13px;font-weight:900;color:var(--warm-dark);text-align:right;white-space:nowrap}
+.bdate{font-size:9px;color:var(--stone);font-weight:600;text-align:right;margin-top:2px;white-space:nowrap}
+.empty{text-align:center;padding:30px 0;color:var(--stone)}
 
-/* export */
-.export-controls{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
-.export-controls select,.export-controls input[type=month]{background:var(--pearl);border:1px solid var(--pearl3);color:var(--warm-dark);padding:7px 10px;border-radius:8px;font-family:'Mulish',sans-serif;font-size:11px;font-weight:600;outline:none}
-.btn-export{display:flex;align-items:center;gap:5px;background:var(--success);color:#fff;border:none;padding:7px 14px;border-radius:8px;font-family:'Mulish',sans-serif;font-size:10px;font-weight:800;cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:opacity .15s;flex-shrink:0}
+.export-controls{display:flex;align-items:flex-end;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.export-controls select,.export-controls input[type=month],.export-controls input[type=date]{background:var(--pearl);border:1px solid var(--pearl3);color:var(--warm-dark);padding:8px 10px;border-radius:8px;font-family:'Mulish',sans-serif;font-size:12px;font-weight:600;outline:none;-webkit-appearance:none;min-width:120px}
+.btn-export{display:flex;align-items:center;gap:5px;background:var(--success);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-family:'Mulish',sans-serif;font-size:10px;font-weight:800;cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:opacity .15s;white-space:nowrap}
 .btn-export:hover{opacity:.86}
-.ctable-wrap{overflow-x:auto;border:1px solid var(--pearl3);border-radius:var(--r)}
-.ctable{width:100%;border-collapse:collapse;font-size:11px}
-.ctable th{background:var(--pearl2);padding:8px 10px;text-align:left;font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--stone);white-space:nowrap}
-.ctable td{padding:8px 10px;border-top:1px solid var(--pearl3);color:var(--warm-dark);font-weight:500;vertical-align:middle}
-.ctable tr:hover td{background:var(--pearl)}
 
-/* pw change */
 .pw-change-row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
-.pw-change-row input{background:var(--pearl);border:1px solid var(--pearl3);color:var(--warm-dark);padding:8px 11px;border-radius:8px;font-family:'Mulish',sans-serif;font-size:12px;font-weight:500;outline:none;width:170px}
+.pw-change-row input{background:var(--pearl);border:1px solid var(--pearl3);color:var(--warm-dark);padding:9px 11px;border-radius:8px;font-family:'Mulish',sans-serif;font-size:13px;font-weight:500;outline:none;width:160px;-webkit-appearance:none}
 .pw-change-row input:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim)}
 
-/* toast */
-.toast{position:fixed;bottom:22px;right:22px;padding:9px 16px;border-radius:var(--r);font-size:12px;font-weight:700;z-index:600;opacity:0;transform:translateY(10px);transition:all .22s ease;pointer-events:none;box-shadow:var(--sh-md)}
-.toast.show{opacity:1;transform:translateY(0)}
+/* ══ TOAST ══ */
+.toast{position:fixed;bottom:max(22px,calc(env(safe-area-inset-bottom)+12px));left:50%;transform:translateX(-50%) translateY(20px);padding:10px 18px;border-radius:999px;font-size:12px;font-weight:700;z-index:600;opacity:0;transition:all .22s ease;pointer-events:none;box-shadow:var(--sh-md);white-space:nowrap;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ══ RESPONSIVE BREAKPOINTS ══ */
+
+/* Tablet: hide checker panel, show checker button */
+@media (max-width: 900px) {
+  .right-panel{display:none}
+  .desktop-tabs{display:flex}
+}
+
+/* Mobile: bottom nav + sheet */
+@media (max-width: 640px) {
+  :root{--tab-h:50px;--bottom-h:58px}
+  .hpills{display:none}
+  .desktop-tabs{display:none}
+  .bottom-nav{display:block}
+  .app-body{bottom:var(--bottom-h)}
+  .checker-sheet{display:flex;flex-direction:column}
+  .cal-panel{padding:10px 8px}
+  .cal-nav{margin-bottom:8px}
+  .month-lbl{font-size:16px;min-width:110px}
+  .legend{display:none}
+  .cal-cell{min-height:72px;padding:4px 3px 2px}
+  .cal-dh{font-size:8px;padding:6px 1px}
+  .cal-daynum{font-size:10px}
+  .cal-free{display:none}
+  .cpill{font-size:7px;padding:1px 3px}
+  .cpill-dot{width:3px;height:3px}
+  .deliver-flag{font-size:8px}
+  .frow{grid-template-columns:1fr}
+  .admin-wrap{padding:14px 10px}
+  .stats-row{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:18px}
+  .settings-grid{grid-template-columns:1fr}
+  .bk-drawer{width:100vw;border-left:none;border-radius:0}
+  .export-controls{flex-direction:column;align-items:stretch}
+  .export-controls select,.export-controls input[type=month],.export-controls input[type=date]{width:100%}
+  .btn-export{width:100%;justify-content:center}
+  .pw-change-row{flex-direction:column}
+  .pw-change-row input{width:100%}
+  .buf-row{grid-template-columns:1fr}
+}
+
+/* Very small screens */
+@media (max-width: 380px) {
+  .topbar-logo{font-size:17px}
+  .btn-new span{display:none}
+  .cal-cell{min-height:58px}
+  .cpill{display:none}
+  .stats-row{grid-template-columns:1fr}
+}
+
+/* Landscape mobile */
+@media (max-height: 500px) and (max-width: 900px) {
+  :root{--tab-h:44px;--bottom-h:50px}
+  .cal-cell{min-height:55px}
+  .admin-lock{min-height:auto;padding:30px 20px}
+}
+
+/* Large screens */
+@media (min-width: 1200px) {
+  .right-panel{width:300px}
+  .cal-panel{padding:20px 24px}
+  .admin-wrap{padding:24px 28px}
+}
 </style>
 </head>
 <body>
 
-<!-- ══ TAB BAR ══ -->
-<div class="app-tabs">
-  <div class="tabs-left">
-    <div class="logo-script">hana.<em>fuji</em>film</div>
-    <button class="tab-btn active" onclick="switchTab('calendar',this)">📅 Lịch thuê</button>
-    <button class="tab-btn" onclick="switchTab('admin',this)">⚙️ Quản lý</button>
+<!-- ══ TOP BAR ══ -->
+<div class="app-topbar">
+  <div style="display:flex;align-items:center;min-width:0">
+    <div class="topbar-logo">hana.<em>fuji</em>film</div>
+    <div class="desktop-tabs">
+      <button class="tab-btn active" onclick="switchTab('calendar',this)">📅 Lịch thuê</button>
+      <button class="tab-btn" onclick="switchTab('admin',this)">⚙️ Quản lý</button>
+    </div>
   </div>
-  <div class="tabs-right">
+  <div class="topbar-right">
     <div class="hpills">
       <div class="hpill"><div class="hpdot" style="background:var(--cam-xs20)"></div><span id="hp-kh">0 KH tháng này</span></div>
       <div class="hpill"><div class="hpdot" style="background:var(--warn)"></div><span id="hp-del">0 giao hôm nay</span></div>
     </div>
     <button class="btn-new" onclick="openDrawer()">
       <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M5.5 1v9M1 5.5h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-      Đặt lịch mới
+      <span>Đặt lịch</span>
     </button>
   </div>
 </div>
 
-<!-- ══ TAB: CALENDAR ══ -->
-<div class="tab-page active" id="tab-calendar">
-  <div class="cal-wrap">
+<!-- ══ APP BODY ══ -->
+<div class="app-body">
 
-    <!-- calendar -->
-    <div class="cal-panel">
-      <div class="cal-nav">
-        <div class="cal-nav-l">
-          <button class="nav-btn" onclick="changeMonth(-1)">‹</button>
-          <div class="month-lbl" id="month-lbl"></div>
-          <button class="nav-btn" onclick="changeMonth(1)">›</button>
-          <button class="nav-btn today-btn" onclick="goToday()">Hôm nay</button>
+  <!-- TAB: CALENDAR -->
+  <div class="tab-page active" id="tab-calendar">
+    <div class="cal-layout">
+
+      <!-- Calendar -->
+      <div class="cal-panel">
+        <div class="cal-nav">
+          <div class="cal-nav-l">
+            <button class="nav-btn" onclick="changeMonth(-1)">‹</button>
+            <div class="month-lbl" id="month-lbl"></div>
+            <button class="nav-btn" onclick="changeMonth(1)">›</button>
+            <button class="nav-btn today-btn" onclick="goToday()">Hôm nay</button>
+          </div>
+          <div class="legend" id="cal-legend"></div>
         </div>
-        <div class="legend">
-          <div class="leg-i"><div class="leg-d" style="background:rgba(176,120,64,.5)"></div>X100V</div>
-          <div class="leg-i"><div class="leg-d" style="background:rgba(74,143,170,.5)"></div>XS20</div>
-          <div class="leg-i"><div class="leg-d" style="background:rgba(122,104,168,.5)"></div>XS10</div>
-          <div class="leg-i"><div class="leg-d" style="background:rgba(168,80,80,.5)"></div>XT4</div>
-          <div class="leg-i"><div class="leg-d" style="background:var(--pearl3);border:1px dashed var(--stone)"></div>Buffer</div>
+        <div class="cal" id="cal"></div>
+      </div>
+
+      <!-- Checker sidebar (desktop) -->
+      <div class="right-panel">
+        <div class="panel-section">
+          <div class="ptitle">Kiểm tra máy trống</div>
+          <div class="ck-type-row">
+            <button class="ck-tb on" id="ckt-ngay" onclick="setCkType('ngay')">Theo ngày</button>
+            <button class="ck-tb" id="ckt-ca" onclick="setCkType('ca')">Theo ca</button>
+          </div>
+          <div id="ck-ngay-fields">
+            <div class="ck-dates">
+              <div class="ck-df"><label>Từ ngày</label><input type="date" id="ck-from" oninput="runChecker()"></div>
+              <div class="ck-df"><label>Đến ngày</label><input type="date" id="ck-to" oninput="runChecker()"></div>
+            </div>
+          </div>
+          <div id="ck-ca-fields" style="display:none">
+            <div style="margin-bottom:8px">
+              <div class="ck-df"><label>Ngày thuê</label><input type="date" id="ck-ca-date" oninput="runChecker()"></div>
+            </div>
+            <div class="ck-cas">
+              <div class="ca-btn" data-ca="sang" onclick="toggleCkCa(this)"><div class="ca-btn-icon">🌅</div><div class="ca-btn-name">Ca Sáng</div><div class="ca-btn-time">6–12h</div></div>
+              <div class="ca-btn" data-ca="chieu" onclick="toggleCkCa(this)"><div class="ca-btn-icon">☀️</div><div class="ca-btn-name">Ca Chiều</div><div class="ca-btn-time">12–18h</div></div>
+              <div class="ca-btn" data-ca="toi" onclick="toggleCkCa(this)"><div class="ca-btn-icon">🌙</div><div class="ca-btn-name">Ca Tối</div><div class="ca-btn-time">18–24h</div></div>
+            </div>
+          </div>
+          <div class="ck-summary" id="ck-summary">Chọn ngày để kiểm tra</div>
+          <div id="ck-results"></div>
         </div>
       </div>
-      <div class="cal" id="cal"></div>
     </div>
+  </div>
 
-    <!-- right panel: checker only -->
-    <div class="right-panel">
-      <div class="panel-section">
-        <div class="ptitle">Kiểm tra máy trống</div>
-        <div class="ck-type-row">
-          <button class="ck-tb on" id="ckt-ngay" onclick="setCkType('ngay')">Theo ngày</button>
-          <button class="ck-tb" id="ckt-ca" onclick="setCkType('ca')">Theo ca</button>
+  <!-- TAB: ADMIN -->
+  <div class="tab-page" id="tab-admin">
+    <div class="admin-page">
+      <div class="admin-wrap">
+
+        <!-- Lock screen -->
+        <div class="admin-lock" id="admin-lock">
+          <div class="admin-lock-icon">🔐</div>
+          <div class="admin-lock-title">Khu vực quản lý</div>
+          <div class="admin-lock-sub">Nhập mật khẩu để tiếp tục</div>
+          <div class="admin-pw-row">
+            <input type="password" id="admin-pw-input" placeholder="Mật khẩu..." onkeydown="if(event.key==='Enter')checkPw()">
+            <button class="admin-pw-btn" onclick="checkPw()">Đăng nhập</button>
+          </div>
+          <div class="admin-pw-err" id="admin-pw-err">Mật khẩu không đúng</div>
         </div>
 
-        <!-- ngay mode: date range -->
-        <div id="ck-ngay-fields">
-          <div class="ck-dates">
-            <div class="ck-df"><label>Từ ngày</label><input type="date" id="ck-from" oninput="runChecker()"></div>
-            <div class="ck-df"><label>Đến ngày</label><input type="date" id="ck-to" oninput="runChecker()"></div>
+        <!-- Admin content -->
+        <div class="admin-content" id="admin-content">
+
+          <!-- Stats -->
+          <div class="admin-section">
+            <div class="admin-section-title">Thống kê doanh thu</div>
+            <div class="stats-ctrl">
+              <input type="month" id="stats-month" onchange="renderStats()">
+              <span style="font-size:11px;color:var(--stone);font-weight:600">Lọc theo tháng</span>
+            </div>
+            <div class="stats-row" id="stats-row"></div>
+          </div>
+
+          <!-- Booking list -->
+          <div class="admin-section">
+            <div class="admin-section-title">Tổng hợp lịch thuê</div>
+            <div style="display:flex;gap:6px;margin-bottom:10px">
+              <button class="ck-tb on" id="bl-mode-month" onclick="setBlistMode('month')">Theo tháng</button>
+              <button class="ck-tb" id="bl-mode-range" onclick="setBlistMode('range')">Khoảng ngày</button>
+            </div>
+            <div class="export-controls" id="bl-month-ctrl">
+              <input type="month" id="export-month" onchange="renderAdminBlist()">
+              <select id="export-cam" onchange="renderAdminBlist()"><option value="all">Tất cả máy</option></select>
+              <button class="btn-export" onclick="exportCSV()">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Xuất CSV
+              </button>
+            </div>
+            <div class="export-controls" id="bl-range-ctrl" style="display:none">
+              <div style="display:flex;flex-direction:column;gap:2px">
+                <label style="font-size:9px;font-weight:800;color:var(--taupe);text-transform:uppercase;letter-spacing:.5px">Từ ngày</label>
+                <input type="date" id="bl-range-from" onchange="renderAdminBlist()">
+              </div>
+              <div style="display:flex;flex-direction:column;gap:2px">
+                <label style="font-size:9px;font-weight:800;color:var(--taupe);text-transform:uppercase;letter-spacing:.5px">Đến ngày</label>
+                <input type="date" id="bl-range-to" onchange="renderAdminBlist()">
+              </div>
+              <select id="export-cam-range" onchange="renderAdminBlist()"><option value="all">Tất cả máy</option></select>
+              <button class="btn-export" onclick="exportCSV()">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Xuất CSV
+              </button>
+            </div>
+            <div class="blist-filters" id="blist-cam-filters">
+              <button class="fbtn on" onclick="setAFilter(this,'all')">Tất cả</button>
+            </div>
+            <div id="admin-blist"></div>
+          </div>
+
+          <!-- Pricing -->
+          <div class="admin-section">
+            <div class="admin-section-title">Cài đặt giá thuê</div>
+            <div id="pricing-settings"></div>
+            <button class="btn-save" onclick="savePricing()">Lưu cài đặt giá</button>
+          </div>
+
+          <!-- Machines -->
+          <div class="admin-section">
+            <div class="admin-section-title">Quản lý máy ảnh</div>
+            <div id="machine-settings"></div>
+            <div style="border-top:1px solid var(--pearl3);margin-top:14px;padding-top:14px">
+              <div style="font-size:10px;font-weight:800;color:var(--stone);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">Thêm máy mới</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+                <div class="sg-field"><label>Mã máy</label><input type="text" id="new-cam-code" placeholder="GFX100" style="width:110px"></div>
+                <div class="sg-field"><label>Tên đầy đủ</label><input type="text" id="new-cam-name" placeholder="Fujifilm GFX100" style="width:170px"></div>
+                <div class="sg-field"><label>Màu</label><input type="color" id="new-cam-color" value="#6a8f70" style="width:46px;height:38px;padding:2px;border-radius:8px;border:1px solid var(--pearl3);cursor:pointer"></div>
+                <button class="admin-pw-btn" onclick="addNewCam()">+ Thêm máy</button>
+              </div>
+            </div>
+            <button class="btn-save" onclick="saveMachines()">Lưu thông tin máy</button>
+          </div>
+
+          <!-- Buffer fee -->
+          <div class="admin-section">
+            <div class="admin-section-title">Phí lấy sớm / trả muộn</div>
+            <div class="settings-grid">
+              <div class="sg-field"><label>Phí lấy sớm (VNĐ)</label><input type="number" id="buf-early-fee" placeholder="50000"></div>
+              <div class="sg-field"><label>Phí trả muộn (VNĐ)</label><input type="number" id="buf-late-fee" placeholder="50000"></div>
+            </div>
+            <button class="btn-save" onclick="saveBufferFee()">Lưu phí buffer</button>
+          </div>
+
+          <!-- Change pw -->
+          <div class="admin-section">
+            <div class="admin-section-title">Đổi mật khẩu</div>
+            <div class="pw-change-row">
+              <input type="password" id="new-pw1" placeholder="Mật khẩu mới">
+              <input type="password" id="new-pw2" placeholder="Xác nhận">
+              <button class="admin-pw-btn" onclick="changePw()">Cập nhật</button>
+            </div>
+          </div>
+
+          <div style="text-align:right;margin-top:-6px">
+            <button style="background:none;border:none;color:var(--stone);font-size:11px;font-weight:700;cursor:pointer;font-family:'Mulish',sans-serif;padding:8px 0" onclick="lockAdmin()">🔒 Đăng xuất</button>
           </div>
         </div>
-
-        <!-- ca mode: single date + ca picker -->
-        <div id="ck-ca-fields" style="display:none">
-          <div style="margin-bottom:8px">
-            <div class="ck-df"><label>Ngày thuê</label><input type="date" id="ck-ca-date" oninput="runChecker()"></div>
-          </div>
-          <div class="ck-cas" style="margin-bottom:8px">
-            <div class="ca-btn" data-ca="sang" onclick="toggleCkCa(this)"><div class="ca-btn-icon">🌅</div><div class="ca-btn-name">Ca Sáng</div><div class="ca-btn-time">6–12h</div></div>
-            <div class="ca-btn" data-ca="chieu" onclick="toggleCkCa(this)"><div class="ca-btn-icon">☀️</div><div class="ca-btn-name">Ca Chiều</div><div class="ca-btn-time">12–18h</div></div>
-            <div class="ca-btn" data-ca="toi" onclick="toggleCkCa(this)"><div class="ca-btn-icon">🌙</div><div class="ca-btn-name">Ca Tối</div><div class="ca-btn-time">18–24h</div></div>
-          </div>
-        </div>
-
-        <div class="ck-summary" id="ck-summary">Chọn ngày để kiểm tra</div>
-        <div id="ck-results"></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ══ TAB: ADMIN ══ -->
-<div class="tab-page" id="tab-admin">
-  <div class="admin-wrap">
+<!-- ══ BOTTOM NAV (mobile) ══ -->
+<div class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <button class="bnav-btn active" id="bnav-calendar" onclick="switchTab('calendar',null,'bnav-calendar')">
+      <div class="bnav-icon">📅</div>
+      <div class="bnav-lbl">Lịch thuê</div>
+    </button>
+    <button class="bnav-btn" id="bnav-checker" onclick="openCheckerSheet()">
+      <div class="bnav-icon">🔍</div>
+      <div class="bnav-lbl">Kiểm tra</div>
+    </button>
+    <button class="bnav-btn" id="bnav-admin" onclick="switchTab('admin',null,'bnav-admin')">
+      <div class="bnav-icon">⚙️</div>
+      <div class="bnav-lbl">Quản lý</div>
+    </button>
+  </div>
+</div>
 
-    <!-- lock -->
-    <div class="admin-lock" id="admin-lock">
-      <div class="admin-lock-icon">🔐</div>
-      <div class="admin-lock-title">Khu vực quản lý</div>
-      <div class="admin-lock-sub">Nhập mật khẩu để tiếp tục</div>
-      <div class="admin-pw-row">
-        <input type="password" id="admin-pw-input" placeholder="Mật khẩu..." onkeydown="if(event.key==='Enter')checkPw()">
-        <button class="admin-pw-btn" onclick="checkPw()">Đăng nhập</button>
-      </div>
-      <div class="admin-pw-err" id="admin-pw-err">Mật khẩu không đúng</div>
+<!-- ══ CHECKER BOTTOM SHEET (mobile) ══ -->
+<div class="checker-sheet" id="checker-sheet">
+  <div class="sheet-handle" onclick="closeCheckerSheet()"></div>
+  <div class="sheet-scroll">
+    <div style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--stone);margin-bottom:12px">Kiểm tra máy trống</div>
+    <div class="ck-type-row">
+      <button class="ck-tb on" id="ckt-ngay-m" onclick="setCkType('ngay')">Theo ngày</button>
+      <button class="ck-tb" id="ckt-ca-m" onclick="setCkType('ca')">Theo ca</button>
     </div>
-
-    <!-- content -->
-    <div class="admin-content" id="admin-content">
-
-      <!-- STATS -->
-      <div class="admin-section">
-        <div class="admin-section-title">Thống kê doanh thu</div>
-        <div class="stats-ctrl">
-          <input type="month" id="stats-month" onchange="renderStats()">
-          <span style="font-size:11px;color:var(--stone);font-weight:600">Lọc theo tháng</span>
-        </div>
-        <div class="stats-row" id="stats-row"></div>
-      </div>
-
-      <!-- BOOKING LIST -->
-      <div class="admin-section">
-        <div class="admin-section-title">Tổng hợp lịch thuê</div>
-        <!-- Filter mode toggle -->
-        <div style="display:flex;gap:6px;margin-bottom:10px">
-          <button class="ck-tb on" id="bl-mode-month" onclick="setBlistMode('month')">Theo tháng</button>
-          <button class="ck-tb" id="bl-mode-range" onclick="setBlistMode('range')">Khoảng ngày</button>
-        </div>
-        <div class="export-controls" id="bl-month-ctrl">
-          <input type="month" id="export-month" onchange="renderAdminBlist()">
-          <select id="export-cam" onchange="renderAdminBlist()">
-            <option value="all">Tất cả máy</option>
-          </select>
-          <button class="btn-export" onclick="exportCSV()">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            Xuất CSV
-          </button>
-        </div>
-        <div class="export-controls" id="bl-range-ctrl" style="display:none">
-          <div class="ck-df"><label style="font-size:9px;font-weight:800;color:var(--taupe);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:2px">Từ ngày</label><input type="date" id="bl-range-from" onchange="renderAdminBlist()"></div>
-          <div class="ck-df"><label style="font-size:9px;font-weight:800;color:var(--taupe);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:2px">Đến ngày</label><input type="date" id="bl-range-to" onchange="renderAdminBlist()"></div>
-          <select id="export-cam-range" onchange="renderAdminBlist()">
-            <option value="all">Tất cả máy</option>
-          </select>
-          <button class="btn-export" onclick="exportCSV()">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            Xuất CSV
-          </button>
-        </div>
-        <div class="blist-filters" id="blist-cam-filters">
-          <button class="fbtn on" onclick="setAFilter(this,'all')">Tất cả</button>
-        </div>
-        <div id="admin-blist"></div>
-      </div>
-
-      <!-- PRICING -->
-      <div class="admin-section">
-        <div class="admin-section-title">Cài đặt giá thuê</div>
-        <div id="pricing-settings"></div>
-        <button class="btn-save" onclick="savePricing()">Lưu cài đặt giá</button>
-      </div>
-
-      <!-- MACHINES -->
-      <div class="admin-section">
-        <div class="admin-section-title">Quản lý máy ảnh</div>
-        <div id="machine-settings"></div>
-        <div style="border-top:1px solid var(--pearl3);margin-top:14px;padding-top:14px">
-          <div style="font-size:10px;font-weight:800;color:var(--stone);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">Thêm máy mới</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
-            <div class="sg-field"><label>Mã máy (VD: GFX100)</label><input type="text" id="new-cam-code" placeholder="GFX100" style="width:120px"></div>
-            <div class="sg-field"><label>Tên đầy đủ</label><input type="text" id="new-cam-name" placeholder="Fujifilm GFX100" style="width:180px"></div>
-            <div class="sg-field"><label>Màu (hex)</label><input type="color" id="new-cam-color" value="#6a8f70" style="width:50px;height:36px;padding:2px 3px;border-radius:8px;border:1px solid var(--pearl3);cursor:pointer"></div>
-            <button class="admin-pw-btn" onclick="addNewCam()" style="margin-bottom:0">+ Thêm máy</button>
-          </div>
-        </div>
-        <button class="btn-save" onclick="saveMachines()">Lưu thông tin máy</button>
-      </div>
-
-      <!-- BUFFER FEE -->
-      <div class="admin-section">
-        <div class="admin-section-title">Cài đặt phí lấy sớm / trả muộn</div>
-        <div class="settings-grid">
-          <div class="sg-field"><label>Phí lấy sớm (VNĐ)</label><input type="number" id="buf-early-fee" placeholder="50000"></div>
-          <div class="sg-field"><label>Phí trả muộn (VNĐ)</label><input type="number" id="buf-late-fee" placeholder="50000"></div>
-        </div>
-        <button class="btn-save" onclick="saveBufferFee()">Lưu phí buffer</button>
-      </div>
-
-      <!-- CHANGE PW -->
-      <div class="admin-section">
-        <div class="admin-section-title">Đổi mật khẩu</div>
-        <div class="pw-change-row">
-          <input type="password" id="new-pw1" placeholder="Mật khẩu mới">
-          <input type="password" id="new-pw2" placeholder="Xác nhận">
-          <button class="admin-pw-btn" onclick="changePw()">Cập nhật</button>
-        </div>
-      </div>
-
-      <div style="text-align:right;margin-top:-8px">
-        <button style="background:none;border:none;color:var(--stone);font-size:11px;font-weight:700;cursor:pointer;font-family:'Mulish',sans-serif" onclick="lockAdmin()">🔒 Đăng xuất</button>
+    <div id="ck-ngay-fields-m">
+      <div class="ck-dates">
+        <div class="ck-df"><label>Từ ngày</label><input type="date" id="ck-from-m" oninput="syncCheckerMobile();runChecker()"></div>
+        <div class="ck-df"><label>Đến ngày</label><input type="date" id="ck-to-m" oninput="syncCheckerMobile();runChecker()"></div>
       </div>
     </div>
+    <div id="ck-ca-fields-m" style="display:none">
+      <div style="margin-bottom:8px">
+        <div class="ck-df"><label>Ngày thuê</label><input type="date" id="ck-ca-date-m" oninput="syncCheckerMobile();runChecker()"></div>
+      </div>
+      <div class="ck-cas">
+        <div class="ca-btn" data-ca="sang" onclick="toggleCkCaMobile(this)"><div class="ca-btn-icon">🌅</div><div class="ca-btn-name">Sáng</div><div class="ca-btn-time">6–12h</div></div>
+        <div class="ca-btn" data-ca="chieu" onclick="toggleCkCaMobile(this)"><div class="ca-btn-icon">☀️</div><div class="ca-btn-name">Chiều</div><div class="ca-btn-time">12–18h</div></div>
+        <div class="ca-btn" data-ca="toi" onclick="toggleCkCaMobile(this)"><div class="ca-btn-icon">🌙</div><div class="ca-btn-name">Tối</div><div class="ca-btn-time">18–24h</div></div>
+      </div>
+    </div>
+    <div class="ck-summary" id="ck-summary-m" style="margin-top:4px">Chọn ngày để kiểm tra</div>
+    <div id="ck-results-m"></div>
   </div>
 </div>
 
@@ -505,32 +653,31 @@ body{font-family:'Mulish',sans-serif;background:var(--pearl);color:var(--warm-da
       <button class="bk-close" onclick="closeDrawer()">✕</button>
     </div>
     <div class="bk-body">
-
-      <div class="fg"><label>Tên khách hàng</label><input id="f-name" type="text" placeholder="Nguyễn Văn A"></div>
+      <div class="fg"><label>Tên khách hàng</label><input id="f-name" type="text" placeholder="Nguyễn Văn A" autocomplete="name"></div>
       <div class="frow">
-        <div class="fg"><label>Số điện thoại</label><input id="f-phone" type="text" placeholder="0901 234 567"></div>
-        <div class="fg"><label>Chiết khấu (%)</label><input id="f-discount" type="number" min="0" max="100" placeholder="0" oninput="updatePrice()"></div>
-      </div>
-      <div class="frow">
-        <div class="fg"><label>Số tiền đã cọc (VNĐ)</label><input id="f-deposit-amt" type="number" min="0" value="100000" oninput="updatePrice()"></div>
-        <div class="fg" style="display:flex;flex-direction:column;justify-content:flex-end">
-          <div id="deposit-refund-preview" style="font-size:10px;font-weight:700;padding:8px 11px;border-radius:var(--r);min-height:36px;display:flex;align-items:center"></div>
-        </div>
+        <div class="fg"><label>Số điện thoại</label><input id="f-phone" type="tel" placeholder="0901 234 567" autocomplete="tel"></div>
+        <div class="fg"><label>Chiết khấu (%)</label><input id="f-discount" type="number" min="0" max="100" placeholder="0" inputmode="numeric" oninput="updatePrice()"></div>
       </div>
       <div class="frow">
         <div class="fg"><label>Hình thức giao máy</label>
           <select id="f-delivery">
             <option value="direct">🤝 Trực tiếp</option>
-            <option value="online">🚚 Trực tuyến (ship)</option>
+            <option value="online">🚚 Ship</option>
           </select>
         </div>
         <div class="fg"><label>Hình thức cọc</label>
           <select id="f-deposit">
             <option value="cash">💵 Tiền mặt</option>
-            <option value="valuables">💎 Vật dụng giá trị</option>
+            <option value="valuables">💎 Vật dụng</option>
             <option value="docs">📄 Giấy tờ</option>
             <option value="none">— Không cọc</option>
           </select>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Số tiền đã cọc (VNĐ)</label><input id="f-deposit-amt" type="number" min="0" value="100000" inputmode="numeric" oninput="updatePrice()"></div>
+        <div class="fg" style="display:flex;flex-direction:column;justify-content:flex-end">
+          <div id="deposit-refund-preview" style="font-size:10px;font-weight:700;padding:9px 11px;border-radius:var(--r);min-height:38px;display:flex;align-items:center"></div>
         </div>
       </div>
 
@@ -538,7 +685,6 @@ body{font-family:'Mulish',sans-serif;background:var(--pearl);color:var(--warm-da
         <div class="cam-grid" id="cam-grid-form"></div>
       </div>
 
-      <!-- Rental type toggle -->
       <div class="fg">
         <label>Hình thức thuê</label>
         <div class="rent-type-row">
@@ -547,7 +693,6 @@ body{font-family:'Mulish',sans-serif;background:var(--pearl);color:var(--warm-da
         </div>
       </div>
 
-      <!-- NGAY mode -->
       <div id="form-ngay">
         <div class="frow">
           <div class="fg"><label>Ngày bắt đầu</label><input type="date" id="f-start" oninput="onDateChange()"></div>
@@ -556,7 +701,6 @@ body{font-family:'Mulish',sans-serif;background:var(--pearl);color:var(--warm-da
         <div class="price-tag" id="price-tier-info">Chọn ngày để xem mức giá áp dụng</div>
       </div>
 
-      <!-- CA mode -->
       <div id="form-ca" style="display:none">
         <div class="fg"><label>Ngày thuê</label><input type="date" id="f-ca-date" oninput="updatePrice()"></div>
         <div class="fg">
@@ -569,23 +713,16 @@ body{font-family:'Mulish',sans-serif;background:var(--pearl);color:var(--warm-da
         </div>
       </div>
 
-      <!-- BUFFER OPTIONS -->
-      <div class="fg" id="buf-section">
+      <div class="fg">
         <label>Lấy sớm / Trả muộn <span style="color:var(--gold);font-size:9px;font-weight:700;text-transform:none;letter-spacing:0" id="buf-fee-label">(+50.000đ / option)</span></label>
         <div class="buf-row">
           <div class="buf-opt" id="buf-early-opt" onclick="toggleBuf('early')">
             <div class="buf-chk" id="buf-early-chk">✓</div>
-            <div>
-              <div class="buf-txt">🌅 Lấy sớm</div>
-              <div class="buf-sub" id="buf-early-desc">Ca trước ngày bắt đầu</div>
-            </div>
+            <div><div class="buf-txt">🌅 Lấy sớm</div><div class="buf-sub" id="buf-early-desc">Ca trước ngày bắt đầu</div></div>
           </div>
           <div class="buf-opt" id="buf-late-opt" onclick="toggleBuf('late')">
             <div class="buf-chk" id="buf-late-chk">✓</div>
-            <div>
-              <div class="buf-txt">🌙 Trả muộn</div>
-              <div class="buf-sub" id="buf-late-desc">Ca sau ngày kết thúc</div>
-            </div>
+            <div><div class="buf-txt">🌙 Trả muộn</div><div class="buf-sub" id="buf-late-desc">Ca sau ngày kết thúc</div></div>
           </div>
         </div>
         <div class="buf-preview" id="buf-preview"></div>
@@ -600,7 +737,7 @@ body{font-family:'Mulish',sans-serif;background:var(--pearl);color:var(--warm-da
         <div class="pbox-val" id="p-val">—</div>
       </div>
 
-      <div class="fg"><label>Ghi chú / Yêu cầu đặc biệt</label>
+      <div class="fg"><label>Ghi chú</label>
         <textarea id="f-note" rows="2" placeholder="Yêu cầu đặc biệt, địa điểm giao máy..."></textarea>
       </div>
     </div>
@@ -610,9 +747,10 @@ body{font-family:'Mulish',sans-serif;background:var(--pearl);color:var(--warm-da
   </div>
 </div>
 
-<!-- DETAIL MODAL -->
-<div class="moverlay" id="modal">
+<!-- ══ DETAIL MODAL ══ -->
+<div class="moverlay" id="modal" onclick="if(event.target===this)closeModal()">
   <div class="modal">
+    <div class="modal-handle"></div>
     <div class="m-cam-line"><div class="m-cam-dot" id="m-dot"></div><span id="m-cam"></span></div>
     <div class="m-cust" id="m-cust"></div>
     <div class="m-sub" id="m-sub"></div>
@@ -623,42 +761,20 @@ body{font-family:'Mulish',sans-serif;background:var(--pearl);color:var(--warm-da
     </div>
   </div>
 </div>
+
 <div class="toast" id="toast"></div>
 
 <script>
 // ════ CONSTANTS ════
 let CAMS = JSON.parse(localStorage.getItem('hana7_cams')||JSON.stringify(['X100V','XS20','XS10','XT4']));
-const CC   = {X100V:'#b07840',XS20:'#4a8faa',XS10:'#7a68a8',XT4:'#a85050'};
-const CB   = {X100V:'rgba(176,120,64,.13)',XS20:'rgba(74,143,170,.13)',XS10:'rgba(122,104,168,.13)',XT4:'rgba(168,80,80,.13)'};
-const CT   = {X100V:'#7a5020',XS20:'#2a6a84',XS10:'#4a3888',XT4:'#882828'};
-const PCLS = {X100V:'px',XS20:'ps',XS10:'pt',XT4:'pf'};
-
-// Ca definitions — ordered by time (earliest = index 0)
 const CA_ORDER = ['sang','chieu','toi'];
 const CAI = {
   sang: {label:'Ca Sáng', icon:'🌅', time:'6:00–12:00'},
   chieu:{label:'Ca Chiều',icon:'☀️',  time:'12:00–18:00'},
   toi:  {label:'Ca Tối',  icon:'🌙', time:'18:00–24:00'},
 };
-
-// Buffer logic:
-// Early pickup = ca just BEFORE the rental start
-//   - if renting sang → buffer = toi of PREVIOUS day
-//   - if renting chieu → buffer = sang (same day, we take the ca just before from previous day... actually it's toi prev day)
-//   Wait — rule: "ca sát nhất trước" = the ca immediately before the first ca on start date
-//   For sang: previous ca in same day doesn't exist → toi of day-1
-//   For chieu: sang of same day
-//   For toi: chieu of same day
-// Late return = ca just AFTER the rental end ca (or last date for ngay)
-//   For sang: chieu of same day
-//   For chieu: toi of same day
-//   For toi: sang of next day
-//   For ngay (day rental): sang of next day after end date
-
 const DEP = {cash:'💵 Tiền mặt',valuables:'💎 Vật dụng giá trị',docs:'📄 Giấy tờ',none:'— Không cọc'};
 const DEL = {direct:'🤝 Trực tiếp',online:'🚚 Trực tuyến'};
-
-// Default pricing
 const DEFAULT_PRICE = {
   X100V:{ca:150000,ngay:250000,n3:216667,n5:190000,n10:170000,n15:150000},
   XS20: {ca:120000,ngay:200000,n3:173333,n5:156000,n10:140000,n15:120000},
@@ -677,27 +793,25 @@ let machines    = JSON.parse(localStorage.getItem('hana7_machines') || JSON.stri
 let bufferFee   = JSON.parse(localStorage.getItem('hana7_buffee')   || '{"early":50000,"late":50000}');
 let adminPw     = localStorage.getItem('hana7_pw') || 'hana2024';
 let adminOpen   = false;
-
 let curMonth    = new Date();
 let selCam      = null;
-let rentType    = 'ngay';   // 'ngay' | 'ca'
-let selCa       = null;     // for ca mode: 'sang'|'chieu'|'toi'
+let rentType    = 'ngay';
+let selCa       = null;
 let bufEarly    = false, bufLate = false;
-
 let ckType      = 'ngay';
 let ckSelCa     = null;
 let adminFilter = 'all';
-let blistMode = 'month';
+let blistMode   = 'month';
+let isMobile    = () => window.innerWidth <= 640;
 
-// ════ CAM COLOR HELPERS (dynamic) ════
+// ════ CAM COLOR HELPERS ════
 function getCamColor(cam){
   const c=machines[cam]?.color;
-  // default palette for original cams
   const def={X100V:'#b07840',XS20:'#4a8faa',XS10:'#7a68a8',XT4:'#a85050'};
   return c||def[cam]||'#888';
 }
-function getCamBg(cam){const h=getCamColor(cam);return hexToRgba(h,0.13);}
-function getCamText(cam){const h=getCamColor(cam);return darken(h,0.55);}
+function getCamBg(cam){return hexToRgba(getCamColor(cam),0.13);}
+function getCamText(cam){return darken(getCamColor(cam),0.55);}
 function hexToRgba(hex,a){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return `rgba(${r},${g},${b},${a})`;}
 function darken(hex,f){const r=Math.round(parseInt(hex.slice(1,3),16)*f),g=Math.round(parseInt(hex.slice(3,5),16)*f),b=Math.round(parseInt(hex.slice(5,7),16)*f);return `rgb(${r},${g},${b})`;}
 
@@ -710,6 +824,9 @@ function init() {
   document.getElementById('ck-from').value = today;
   document.getElementById('ck-to').value   = today;
   document.getElementById('ck-ca-date').value = today;
+  document.getElementById('ck-from-m').value = today;
+  document.getElementById('ck-to-m').value   = today;
+  document.getElementById('ck-ca-date-m').value = today;
   document.getElementById('bl-range-from').value = today.slice(0,8)+'01';
   document.getElementById('bl-range-to').value = today;
   document.getElementById('stats-month').value = today.slice(0,7);
@@ -727,16 +844,57 @@ const addDays  = (ds,n)=>{ const d=new Date(ds); d.setDate(d.getDate()+n); retur
 const diffDays = (a,b)=>Math.round((new Date(b)-new Date(a))/86400000)+1;
 const fmtDate  = ds=>{ if(!ds)return'—'; const[y,m,d]=ds.split('-'); return`${d}/${m}/${y}`; };
 const fmtVND   = n=>Math.round(n).toLocaleString('vi-VN')+'đ';
-
 function save() { localStorage.setItem('hana7_bookings',JSON.stringify(bookings)); }
 
 // ════ TABS ════
-function switchTab(name,el) {
+function switchTab(name, desktopEl, mobileId) {
+  // Desktop tab buttons
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  if(desktopEl) desktopEl.classList.add('active');
+  else {
+    const btn = document.querySelector(`.tab-btn[onclick*="${name}"]`);
+    if(btn) btn.classList.add('active');
+  }
+  // Pages
   document.querySelectorAll('.tab-page').forEach(p=>p.classList.remove('active'));
-  el.classList.add('active');
   document.getElementById('tab-'+name).classList.add('active');
+  // Mobile nav
+  document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('active'));
+  if(mobileId) document.getElementById(mobileId)?.classList.add('active');
   if(name==='admin') initAdmin();
+  // Close checker sheet if open
+  closeCheckerSheet();
+}
+
+// ════ CHECKER SHEET (mobile) ════
+function openCheckerSheet(){
+  document.getElementById('checker-sheet').classList.add('open');
+  document.body.style.overflow='hidden';
+  document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('bnav-checker')?.classList.add('active');
+}
+function closeCheckerSheet(){
+  document.getElementById('checker-sheet').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+function syncCheckerMobile(){
+  // Sync mobile inputs to desktop inputs
+  const mf=document.getElementById('ck-from-m'), mt=document.getElementById('ck-to-m');
+  const md=document.getElementById('ck-ca-date-m');
+  if(mf) document.getElementById('ck-from').value=mf.value;
+  if(mt) document.getElementById('ck-to').value=mt.value;
+  if(md) document.getElementById('ck-ca-date').value=md.value;
+}
+
+function toggleCkCaMobile(el){
+  document.querySelectorAll('#ck-ca-fields-m .ca-btn').forEach(e=>e.classList.remove('on'));
+  ckSelCa=el.dataset.ca; el.classList.add('on');
+  // Sync to desktop
+  document.querySelectorAll('#ck-ca-fields .ca-btn').forEach(e=>{
+    e.classList.toggle('on',e.dataset.ca===ckSelCa);
+  });
+  runChecker();
 }
 
 // ════ ADMIN ════
@@ -754,13 +912,11 @@ function checkPw() {
     setTimeout(()=>e.style.display='none',2000);
   }
 }
-
 function lockAdmin() {
   adminOpen=false;
   document.getElementById('admin-lock').style.display='flex';
   document.getElementById('admin-content').style.display='none';
 }
-
 function initAdmin() {
   if(!adminOpen) return;
   refreshCamSelects();
@@ -772,7 +928,6 @@ function initAdmin() {
   document.getElementById('buf-late-fee').value  = bufferFee.late;
   updateBufFeeLabel();
 }
-
 function changePw() {
   const p1=document.getElementById('new-pw1').value.trim();
   const p2=document.getElementById('new-pw2').value.trim();
@@ -793,10 +948,10 @@ function renderStats() {
   const rentalCount = mb.length;
   const allCams=CAMS; const busyToday = allCams.filter(c=>bookings.some(b=>b.camera===c&&todayStr()>=b.start&&todayStr()<=b.end)).length;
   const cards = [
-    {num:fmtVND(rev),  lbl:'Doanh thu tháng',   color:'var(--gold)'},
-    {num:kh,           lbl:'Khách hàng tháng',   color:'var(--cam-xs20)'},
-    {num:rentalCount,  lbl:'Lượt thuê tháng',    color:'var(--cam-xs10)'},
-    {num:busyToday,    lbl:'Máy đang cho thuê',  color:'var(--warn)'},
+    {num:fmtVND(rev),  lbl:'Doanh thu tháng',  color:'var(--gold)'},
+    {num:kh,           lbl:'Khách hàng tháng',  color:'var(--cam-xs20)'},
+    {num:rentalCount,  lbl:'Lượt thuê tháng',   color:'var(--cam-xs10)'},
+    {num:busyToday,    lbl:'Máy đang cho thuê', color:'var(--warn)'},
   ];
   document.getElementById('stats-row').innerHTML=cards.map(c=>`
     <div class="stat-card" style="border-top:2px solid ${c.color}">
@@ -804,7 +959,6 @@ function renderStats() {
       <div class="stat-lbl">${c.lbl}</div>
     </div>`).join('');
 }
-
 function renderHeaderStats() {
   const today=todayStr(),ym=today.slice(0,7);
   const mb=bookings.filter(b=>b.start.startsWith(ym));
@@ -819,7 +973,6 @@ function setAFilter(el,f) {
   document.querySelectorAll('.blist-filters .fbtn').forEach(b=>b.classList.remove('on'));
   el.classList.add('on'); adminFilter=f; renderAdminBlist();
 }
-
 function renderAdminBlist() {
   refreshCamSelects();
   let list = getAdminBlistFiltered();
@@ -830,43 +983,42 @@ function renderAdminBlist() {
     const bufTag=(b.bufEarly||b.bufLate)?`<span class="btag" style="background:var(--gold-dim);color:var(--gold)">${b.bufEarly?'🌅':''} ${b.bufLate?'🌙':''}</span>`:'';
     const rentLbl=b.rental==='ca'?`${CAI[b.ca]?.icon||''} ${CAI[b.ca]?.label||''}`:b.rentalLabel;
     return `<div class="bcard" onclick="openModal('${b.id}')">
-      <div class="bcam" style="background:${CB[b.camera]};color:${CT[b.camera]}">${b.camera}</div>
+      <div class="bcam" style="background:${getCamBg(b.camera)};color:${getCamText(b.camera)}">${b.camera}</div>
       <div>
         <div class="bname">${b.name}</div>
         <div class="bsub">${b.phone||'—'}</div>
-        <div class="btags"><span class="btag" style="background:${CB[b.camera]};color:${CT[b.camera]}">${rentLbl}</span>${bufTag}</div>
+        <div class="btags"><span class="btag" style="background:${getCamBg(b.camera)};color:${getCamText(b.camera)}">${rentLbl}</span>${bufTag}</div>
       </div>
-      <div style="text-align:right">
+      <div>
         <div class="bamt">${fmtVND(b.price)}</div>
         <div class="bdate">${dl}</div>
       </div>
-      <div></div>
     </div>`;
   }).join('');
 }
 
-// ════ PRICING & MACHINES SETTINGS ════
+// ════ PRICING & MACHINES ════
 function renderPricingSettings() {
   document.getElementById('pricing-settings').innerHTML=CAMS.map(cam=>{
-    const p=pricing[cam]||{ca:0,ngay:0,n3:0,n5:0};
+    const p=pricing[cam]||{ca:0,ngay:0,n3:0,n5:0,n10:0,n15:0};
     return `<div class="sg-cam-block">
       <div class="sg-cam-title"><div class="sg-cam-dot" style="background:${getCamColor(cam)}"></div>${machines[cam]?.name||cam} <span style="font-size:9px;color:var(--stone)">(${cam})</span></div>
       <div class="settings-grid">
-        <div class="sg-field"><label>Giá / ca</label><input type="number" id="pr-${cam}-ca" value="${p.ca}"></div>
-        <div class="sg-field"><label>Đơn giá / ngày (1–2 ngày)</label><input type="number" id="pr-${cam}-ngay" value="${p.ngay}"></div>
-        <div class="sg-field"><label>Đơn giá / ngày (3–4 ngày)</label><input type="number" id="pr-${cam}-n3" value="${p.n3}"></div>
-        <div class="sg-field"><label>Đơn giá / ngày (5–9 ngày)</label><input type="number" id="pr-${cam}-n5" value="${p.n5}"></div>
-        <div class="sg-field"><label>Đơn giá / ngày (10–14 ngày)</label><input type="number" id="pr-${cam}-n10" value="${p.n10||''}"></div>
-        <div class="sg-field"><label>Đơn giá / ngày (15+ ngày)</label><input type="number" id="pr-${cam}-n15" value="${p.n15||''}"></div>
+        <div class="sg-field"><label>Giá / ca</label><input type="number" inputmode="numeric" id="pr-${cam}-ca" value="${p.ca}"></div>
+        <div class="sg-field"><label>Đơn giá / ngày (1–2 ngày)</label><input type="number" inputmode="numeric" id="pr-${cam}-ngay" value="${p.ngay}"></div>
+        <div class="sg-field"><label>Đơn giá / ngày (3–4 ngày)</label><input type="number" inputmode="numeric" id="pr-${cam}-n3" value="${p.n3}"></div>
+        <div class="sg-field"><label>Đơn giá / ngày (5–9 ngày)</label><input type="number" inputmode="numeric" id="pr-${cam}-n5" value="${p.n5}"></div>
+        <div class="sg-field"><label>Đơn giá / ngày (10–14 ngày)</label><input type="number" inputmode="numeric" id="pr-${cam}-n10" value="${p.n10||''}"></div>
+        <div class="sg-field"><label>Đơn giá / ngày (15+ ngày)</label><input type="number" inputmode="numeric" id="pr-${cam}-n15" value="${p.n15||''}"></div>
       </div>
     </div>`;
   }).join('');
 }
-
 function savePricing() {
   CAMS.forEach(cam=>{
     ['ca','ngay','n3','n5','n10','n15'].forEach(k=>{
-      const v=parseInt(document.getElementById(`pr-${cam}-${k}`).value)||0;
+      const v=parseInt(document.getElementById(`pr-${cam}-${k}`)?.value)||0;
+      if(!pricing[cam]) pricing[cam]={};
       pricing[cam][k]=v;
     });
   });
@@ -874,40 +1026,27 @@ function savePricing() {
   toast('✓ Đã lưu giá');
   updatePrice();
 }
-
 function renderMachineSettings() {
   document.getElementById('machine-settings').innerHTML=CAMS.map(cam=>{
     const mc=machines[cam]||{};
     const isDefault=['X100V','XS20','XS10','XT4'].includes(cam);
-    const delBtn=!isDefault?`<button onclick="removeCam('${cam}')" style="margin-left:auto;background:rgba(168,80,80,.08);border:1px solid rgba(168,80,80,.2);color:var(--danger);padding:2px 8px;border-radius:5px;font-size:9px;cursor:pointer;font-family:'Mulish',sans-serif;font-weight:800">Xóa</button>`:'';
+    const delBtn=!isDefault?`<button onclick="removeCam('${cam}')" style="margin-left:auto;background:rgba(168,80,80,.08);border:1px solid rgba(168,80,80,.2);color:var(--danger);padding:3px 9px;border-radius:5px;font-size:9px;cursor:pointer;font-family:'Mulish',sans-serif;font-weight:800">Xóa</button>`:'';
     return `<div class="sg-cam-block">
       <div class="sg-cam-title">
         <div class="sg-cam-dot" style="background:${getCamColor(cam)}"></div>
         <span style="font-size:11px;font-weight:800;color:var(--warm-dark)">${cam}</span>
-        <span style="font-size:9px;color:var(--stone);font-weight:600;margin-left:4px">${mc.name||''}</span>
+        <span style="font-size:9px;color:var(--stone);font-weight:600">${mc.name||''}</span>
         ${delBtn}
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
-        <div class="sg-field" style="flex:1;min-width:90px">
-          <label>Mã máy</label>
-          <input type="text" id="mcode-${cam}" value="${cam}">
-        </div>
-        <div class="sg-field" style="flex:2;min-width:140px">
-          <label>Tên đầy đủ</label>
-          <input type="text" id="mc-${cam}" value="${mc.name||cam}">
-        </div>
-        <div class="sg-field">
-          <label>Màu</label>
-          <input type="color" id="mcc-${cam}" value="${getCamColor(cam)}" style="width:50px;height:36px;padding:2px 3px;border-radius:8px;border:1px solid var(--pearl3);cursor:pointer">
-        </div>
+        <div class="sg-field" style="flex:1;min-width:80px"><label>Mã máy</label><input type="text" id="mcode-${cam}" value="${cam}"></div>
+        <div class="sg-field" style="flex:2;min-width:130px"><label>Tên đầy đủ</label><input type="text" id="mc-${cam}" value="${mc.name||cam}"></div>
+        <div class="sg-field"><label>Màu</label><input type="color" id="mcc-${cam}" value="${getCamColor(cam)}" style="width:46px;height:38px;padding:2px;border-radius:8px;border:1px solid var(--pearl3);cursor:pointer"></div>
       </div>
     </div>`;
   }).join('');
 }
-
 function saveMachines() {
-  const isDefault = cam => ['X100V','XS20','XS10','XT4'].includes(cam);
-  // Collect renames for ALL cams with changed code
   const renames = {};
   let dupError = false;
   CAMS.forEach(cam=>{
@@ -916,9 +1055,7 @@ function saveMachines() {
       const newCode=codeEl.value.trim().toUpperCase().replace(/\s+/g,'');
       if(!newCode){ toast('⚠ Mã máy không được để trống',true); dupError=true; return; }
       if(newCode!==cam){
-        // Check duplicate against current CAMS excluding this one
         const otherCams=CAMS.filter(c=>c!==cam);
-        // Also check against other pending renames
         const pendingNewCodes=Object.values(renames);
         if(otherCams.includes(newCode)||pendingNewCodes.includes(newCode)){
           toast(`⚠ Mã máy "${newCode}" đã tồn tại`,true); dupError=true; return;
@@ -928,8 +1065,6 @@ function saveMachines() {
     }
   });
   if(dupError) return;
-  // Apply renames
-  // Apply all renames
   Object.entries(renames).forEach(([oldCode,newCode])=>{
     const idx=CAMS.indexOf(oldCode);
     if(idx>-1) CAMS[idx]=newCode;
@@ -937,11 +1072,9 @@ function saveMachines() {
     pricing[newCode]={...pricing[oldCode]};
     delete machines[oldCode];
     delete pricing[oldCode];
-    // Update bookings to new code
     bookings.forEach(b=>{ if(b.camera===oldCode) b.camera=newCode; });
     save();
   });
-  // Save name + color for all cams
   CAMS.forEach(cam=>{
     const n=document.getElementById('mc-'+cam);
     const c=document.getElementById('mcc-'+cam);
@@ -955,7 +1088,6 @@ function saveMachines() {
   toast('✓ Đã lưu thông tin máy');
   refreshCamSelects(); renderPricingSettings(); renderMachineSettings(); renderCalendar();
 }
-
 function removeCam(cam){
   if(['X100V','XS20','XS10','XT4'].includes(cam)) return toast('Không thể xóa máy mặc định',true);
   if(bookings.some(b=>b.camera===cam)) return toast('⚠ Máy đang có lịch thuê, không thể xóa',true);
@@ -967,16 +1099,12 @@ function removeCam(cam){
   refreshCamSelects(); renderPricingSettings(); renderMachineSettings(); renderCalendar();
   toast(`Đã xóa máy ${cam}`);
 }
-
 function saveBufferFee() {
   bufferFee.early=parseInt(document.getElementById('buf-early-fee').value)||0;
   bufferFee.late =parseInt(document.getElementById('buf-late-fee').value)||0;
   localStorage.setItem('hana7_buffee',JSON.stringify(bufferFee));
-  updateBufFeeLabel();
-  toast('✓ Đã lưu phí buffer');
-  updatePrice();
+  updateBufFeeLabel(); toast('✓ Đã lưu phí buffer'); updatePrice();
 }
-
 function updateBufFeeLabel() {
   const el=document.getElementById('buf-fee-label');
   if(el) el.textContent=`(+${fmtVND(bufferFee.early)} lấy sớm / +${fmtVND(bufferFee.late)} trả muộn)`;
@@ -1020,28 +1148,19 @@ function setRentType(t) {
   document.querySelectorAll('.ca-s').forEach(e=>e.classList.remove('on'));
   updatePrice(); updateBufPreview();
 }
-
 function pickCam(el) {
   document.querySelectorAll('#cam-grid-form .cam-opt').forEach(e=>e.classList.remove('sel'));
   el.classList.add('sel'); selCam=el.dataset.cam;
   updatePrice();
 }
-
 function pickCa(el) {
   document.querySelectorAll('.ca-s').forEach(e=>e.classList.remove('on'));
   el.classList.add('on'); selCa=el.dataset.ca;
   updatePrice(); updateBufPreview();
 }
-
 function onDateChange() { updatePrice(); updateBufPreview(); }
 
 // ── PRICING LOGIC ──
-// Mỗi mức là ĐƠN GIÁ MỖI NGÀY khi thuê đủ mốc đó
-//   1–2 ngày  → p.ngay /ngày
-//   3–4 ngày  → p.n3   /ngày
-//   5–9 ngày  → p.n5   /ngày
-//   10–14 ngày→ p.n10  /ngày
-//   15+ ngày  → p.n15  /ngày
 function calcDayPrice(cam, days) {
   if(days<=0) return {total:0, unitRate:0, tierName:'', label:''};
   const p=pricing[cam]||{ca:100000,ngay:150000,n3:120000,n5:100000,n10:90000,n15:80000};
@@ -1066,13 +1185,11 @@ function updatePrice() {
   const disc=parseFloat(document.getElementById('f-discount').value)||0;
   const pv=document.getElementById('p-val'),ps=document.getElementById('p-sub'),pd=document.getElementById('p-disc');
   const ti=document.getElementById('price-tier-info');
-
   if(!selCam){
     pv.textContent='—';ps.textContent='Chọn máy & ngày thuê';pd.textContent='';
     if(ti) ti.textContent='Chọn ngày để xem mức giá áp dụng';
     return;
   }
-
   let base=0, subTxt='';
   if(rentType==='ca'){
     if(!selCa){pv.textContent='—';ps.textContent='Chọn ca thuê';pd.textContent='';return;}
@@ -1090,87 +1207,59 @@ function updatePrice() {
     const {total,label}=calcDayPrice(selCam,days);
     base=total;
     subTxt=`${selCam} · ${label}`;
-    if(ti) ti.innerHTML=`<span class="price-tier">${label}</span>`; // bracket rate × days
+    if(ti) ti.innerHTML=`<span class="price-tier">${label}</span>`;
   }
-
-  // Buffer fees
   let bufAdd=0;
   if(bufEarly) bufAdd+=bufferFee.early;
   if(bufLate)  bufAdd+=bufferFee.late;
   const baseTotal=base+bufAdd;
   const final=Math.round(baseTotal*(1-disc/100));
-
   pv.textContent=fmtVND(final);
-  // Deposit refund preview in form
   const depAmt=parseFloat(document.getElementById('f-deposit-amt').value)||0;
   const refPrev=document.getElementById('deposit-refund-preview');
   if(refPrev&&depAmt>0){
     const diff=depAmt-final;
-    if(diff>0) refPrev.style.cssText='font-size:10px;font-weight:700;padding:8px 11px;border-radius:var(--r);min-height:36px;display:flex;align-items:center;background:rgba(90,158,122,.1);color:var(--success)';
-    else if(diff<0) refPrev.style.cssText='font-size:10px;font-weight:700;padding:8px 11px;border-radius:var(--r);min-height:36px;display:flex;align-items:center;background:rgba(168,80,80,.08);color:var(--danger)';
-    else refPrev.style.cssText='font-size:10px;font-weight:700;padding:8px 11px;border-radius:var(--r);min-height:36px;display:flex;align-items:center;background:var(--pearl2);color:var(--stone)';
+    if(diff>0) refPrev.style.cssText='font-size:10px;font-weight:700;padding:9px 11px;border-radius:var(--r);min-height:38px;display:flex;align-items:center;background:rgba(90,158,122,.1);color:var(--success)';
+    else if(diff<0) refPrev.style.cssText='font-size:10px;font-weight:700;padding:9px 11px;border-radius:var(--r);min-height:38px;display:flex;align-items:center;background:rgba(168,80,80,.08);color:var(--danger)';
+    else refPrev.style.cssText='font-size:10px;font-weight:700;padding:9px 11px;border-radius:var(--r);min-height:38px;display:flex;align-items:center;background:var(--pearl2);color:var(--stone)';
     refPrev.textContent=diff>0?`Hoàn lại: ${fmtVND(diff)}`:diff<0?`Còn thiếu: ${fmtVND(-diff)}`:'Vừa đủ ✓';
   } else if(refPrev){ refPrev.textContent=''; refPrev.style.background=''; }
   ps.textContent=subTxt+(bufAdd>0?` + buffer`:'');
-  pd.textContent=disc>0?`Giảm ${disc}% từ ${fmtVND(baseTotal)}`
-    :bufAdd>0?`Bao gồm phí buffer ${fmtVND(bufAdd)}`:'';
+  pd.textContent=disc>0?`Giảm ${disc}% từ ${fmtVND(baseTotal)}`:bufAdd>0?`Bao gồm phí buffer ${fmtVND(bufAdd)}`:'';
 }
 
 // ════ BUFFER LOGIC ════
-// Early: ca immediately BEFORE start ca / start date
-// Late: ca immediately AFTER end ca / end date
 function getBufEarlyEvent(b) {
   if(b.rental==='ca'){
     const idx=CA_ORDER.indexOf(b.ca);
-    if(idx===0){
-      // sang → buffer = toi of prev day
-      return {date:addDays(b.start,-1), ca:'toi'};
-    } else {
-      // chieu → sang same day; toi → chieu same day
-      return {date:b.start, ca:CA_ORDER[idx-1]};
-    }
-  } else {
-    // Day rental: buffer = toi of day before start
-    return {date:addDays(b.start,-1), ca:'toi'};
-  }
+    if(idx===0) return {date:addDays(b.start,-1), ca:'toi'};
+    else return {date:b.start, ca:CA_ORDER[idx-1]};
+  } else return {date:addDays(b.start,-1), ca:'toi'};
 }
-
 function getBufLateEvent(b) {
   if(b.rental==='ca'){
     const idx=CA_ORDER.indexOf(b.ca);
-    if(idx===CA_ORDER.length-1){
-      // toi → buffer = sang of next day
-      return {date:addDays(b.end,1), ca:'sang'};
-    } else {
-      // sang → chieu same day; chieu → toi same day
-      return {date:b.end, ca:CA_ORDER[idx+1]};
-    }
-  } else {
-    // Day rental: buffer = sang of day after end
-    return {date:addDays(b.end,1), ca:'sang'};
-  }
+    if(idx===CA_ORDER.length-1) return {date:addDays(b.end,1), ca:'sang'};
+    else return {date:b.end, ca:CA_ORDER[idx+1]};
+  } else return {date:addDays(b.end,1), ca:'sang'};
 }
-
 function calcBufEvents(b) {
   const evs=[];
   if(b.bufEarly){ const e=getBufEarlyEvent(b); evs.push({...e,type:'early',cam:b.camera,name:b.name,id:b.id}); }
   if(b.bufLate) { const e=getBufLateEvent(b);  evs.push({...e,type:'late', cam:b.camera,name:b.name,id:b.id}); }
   return evs;
 }
-
 function toggleBuf(which) {
   if(which==='early'){bufEarly=!bufEarly;document.getElementById('buf-early-opt').classList.toggle('on',bufEarly);}
   else{bufLate=!bufLate;document.getElementById('buf-late-opt').classList.toggle('on',bufLate);}
   updateBufPreview(); updatePrice();
 }
-
 function updateBufPreview() {
   const el=document.getElementById('buf-preview');
   const parts=[];
   const startDs=rentType==='ca'?document.getElementById('f-ca-date').value:document.getElementById('f-start').value;
   const endDs  =rentType==='ca'?document.getElementById('f-ca-date').value:document.getElementById('f-end').value;
   const fakeCa = rentType==='ca'?selCa:'ngay';
-
   if(bufEarly&&startDs){
     const fakeB={rental:rentType,ca:fakeCa,start:startDs,end:endDs||startDs,bufEarly:true,bufLate:false};
     const ev=getBufEarlyEvent(fakeB);
@@ -1193,12 +1282,9 @@ function addBooking() {
   const discount=parseFloat(document.getElementById('f-discount').value)||0;
   const note    =document.getElementById('f-note').value.trim();
   const depositAmt=parseFloat(document.getElementById('f-deposit-amt').value)||0;
-
   if(!name)   return toast('⚠ Vui lòng nhập tên khách hàng',true);
   if(!selCam) return toast('⚠ Vui lòng chọn máy ảnh',true);
-
   let start,end,ca=null,rentalLabel='',baseAmt=0;
-
   if(rentType==='ca'){
     const d=document.getElementById('f-ca-date').value;
     if(!d)    return toast('⚠ Vui lòng chọn ngày thuê',true);
@@ -1215,12 +1301,10 @@ function addBooking() {
     const {total,label}=calcDayPrice(selCam,days);
     baseAmt=total; rentalLabel=`${days} ngày`;
   }
-
   let bufAdd=0;
   if(bufEarly) bufAdd+=bufferFee.early;
   if(bufLate)  bufAdd+=bufferFee.late;
   const price=Math.round((baseAmt+bufAdd)*(1-discount/100));
-
   bookings.push({
     id:Date.now().toString(),name,phone,delivery,deposit,discount,
     camera:selCam,rental:rentType,ca,rentalLabel,
@@ -1228,7 +1312,6 @@ function addBooking() {
     bufEarly,bufLate,
     note,created:new Date().toLocaleDateString('vi-VN')
   });
-
   save(); renderCalendar(); renderHeaderStats();
   if(adminOpen){ renderStats(); renderAdminBlist(); }
   runChecker(); resetForm(); closeDrawer();
@@ -1268,7 +1351,6 @@ function resetForm() {
 
 // ════ DRAWER ════
 function openDrawer(){
-  // Rebuild cam grid dynamically
   document.getElementById('cam-grid-form').innerHTML=CAMS.map(c=>`
     <div class="cam-opt" data-cam="${c}" onclick="pickCam(this)">
       <div class="cam-sw" style="background:${getCamColor(c)}"></div>
@@ -1276,6 +1358,8 @@ function openDrawer(){
     </div>`).join('');
   document.getElementById('bk-overlay').classList.add('open');
   document.body.style.overflow='hidden';
+  // Close checker sheet if open
+  closeCheckerSheet();
 }
 function closeDrawer(){document.getElementById('bk-overlay').classList.remove('open');document.body.style.overflow='';}
 function handleOverlay(e){if(e.target===document.getElementById('bk-overlay'))closeDrawer();}
@@ -1299,26 +1383,17 @@ function renderCalendar() {
 function cellHtml(date,other,today) {
   const ds=date.toISOString().split('T')[0];
   const isToday=ds===today;
-
-  // Regular bookings on this date
   const bs=bookings.filter(b=>ds>=b.start&&ds<=b.end);
-
-  // Buffer events on this date
   const bufEvs=[];
   bookings.forEach(b=>{ calcBufEvents(b).forEach(ev=>{if(ev.date===ds)bufEvs.push(ev);}); });
-
-  // Delivery flag
   const hasDelivery=bookings.some(b=>b.start===ds);
-
-  // Free cameras (exclude both regular and buffer)
   const busyCams=new Set([...bs.map(b=>b.camera),...bufEvs.map(e=>e.cam)]);
   const freeCams=CAMS.filter(c=>!busyCams.has(c));
-  const freeHtml=freeCams.length===4
+  const freeHtml=freeCams.length===CAMS.length
     ?`<div class="cal-free"><span class="free-tag" style="color:var(--success);border-color:var(--success)">Tất cả trống</span></div>`
     :freeCams.length>0
       ?`<div class="cal-free">${freeCams.map(c=>`<span class="free-tag" style="color:${getCamText(c)};border-color:${getCamText(c)}">${c}</span>`).join('')}</div>`:'';
 
-  // Booking pills — show: "Ca Tối · Nguyễn Văn A · XT4" or "Nguyễn Văn A · XT4" for day rental
   let pills=bs.slice(0,2).map(b=>{
     const namePart=`${b.name} · ${b.camera}`;
     const fullLbl=b.rental==='ca'?`${CAI[b.ca]?.icon||''} ${CAI[b.ca]?.label||''} · ${namePart}`:namePart;
@@ -1326,18 +1401,17 @@ function cellHtml(date,other,today) {
     const ttHtml=hasNote?`<div class="tt-box"><div class="tt-head">${b.camera} · ${b.name}</div><div class="tt-note">${b.note}</div></div>`:'';
     return `<div class="cpill" style="background:${getCamBg(b.camera)};color:${getCamText(b.camera)}" onclick="openModal('${b.id}')">
       <div class="cpill-dot" style="background:${getCamText(b.camera)};opacity:.7"></div>
-      <span style="overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0">${fullLbl}</span>
-      ${hasNote?'<span style="font-size:8px;flex-shrink:0">⚠</span>':''}
+      <span class="cpill-text">${fullLbl}</span>
+      ${hasNote?'<span style="font-size:7px;flex-shrink:0">⚠</span>':''}
       ${ttHtml}
     </div>`;
   }).join('');
-  if(bs.length>2) pills+=`<div class="cpill-more">+${bs.length-2} khác</div>`;
+  if(bs.length>2) pills+=`<div class="cpill-more">+${bs.length-2}</div>`;
 
-  // Buffer pills (dashed border)
   const bufPills=bufEvs.map(ev=>`
     <div class="cpill buffer" style="color:${getCamText(ev.cam)};border-color:${getCamText(ev.cam)}" onclick="openModal('${ev.id}')">
       <div class="cpill-dot" style="background:${getCamText(ev.cam)};opacity:.5"></div>
-      <span style="overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0">${ev.type==='early'?'🌅':'🌙'} ${CAI[ev.ca].label} · ${ev.name}</span>
+      <span class="cpill-text">${ev.type==='early'?'🌅':'🌙'} ${CAI[ev.ca].label} · ${ev.name}</span>
     </div>`).join('');
 
   return `<div class="cal-cell${other?' other':''}${isToday?' today':''}">
@@ -1347,89 +1421,80 @@ function cellHtml(date,other,today) {
   </div>`;
 }
 
-document.addEventListener('mouseover',function(e){
-  const pill=e.target.closest('.cpill.tt-wrap');
-  if(!pill)return;
-  const tt=pill.querySelector('.tt-box');if(!tt)return;
-  const r=pill.getBoundingClientRect();
-  tt.style.left=r.left+'px';tt.style.top=(r.top-8)+'px';tt.style.transform='translateY(-100%)';
-});
-
 function changeMonth(d){curMonth.setMonth(curMonth.getMonth()+d);renderCalendar();}
 function goToday(){curMonth=new Date();renderCalendar();}
 
-// ════ AVAILABILITY CHECKER ════
+// ════ CHECKER ════
 function setCkType(t) {
   ckType=t; ckSelCa=null;
-  document.getElementById('ckt-ngay').classList.toggle('on',t==='ngay');
-  document.getElementById('ckt-ca').classList.toggle('on',t==='ca');
-  document.getElementById('ck-ngay-fields').style.display=t==='ngay'?'block':'none';
-  document.getElementById('ck-ca-fields').style.display=t==='ca'?'block':'none';
-  document.querySelectorAll('#ck-ca-fields .ca-btn').forEach(e=>e.classList.remove('on'));
+  ['ckt-ngay','ckt-ngay-m'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.toggle('on',t==='ngay');});
+  ['ckt-ca','ckt-ca-m'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.toggle('on',t==='ca');});
+  ['ck-ngay-fields','ck-ngay-fields-m'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=t==='ngay'?'block':'none';});
+  ['ck-ca-fields','ck-ca-fields-m'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=t==='ca'?'block':'none';});
+  document.querySelectorAll('#ck-ca-fields .ca-btn,#ck-ca-fields-m .ca-btn').forEach(e=>e.classList.remove('on'));
   runChecker();
 }
-
 function toggleCkCa(el) {
   document.querySelectorAll('#ck-ca-fields .ca-btn').forEach(e=>e.classList.remove('on'));
-  ckSelCa=el.dataset.ca;
-  el.classList.add('on');
+  ckSelCa=el.dataset.ca; el.classList.add('on');
+  document.querySelectorAll('#ck-ca-fields-m .ca-btn').forEach(e=>e.classList.toggle('on',e.dataset.ca===ckSelCa));
   runChecker();
 }
 
 function runChecker() {
-  const sumEl=document.getElementById('ck-summary');
-  const resEl=document.getElementById('ck-results');
+  const sumEl =document.getElementById('ck-summary');
+  const resEl =document.getElementById('ck-results');
+  const sumElM=document.getElementById('ck-summary-m');
+  const resElM=document.getElementById('ck-results-m');
 
+  let sumHtml='', resHtml='';
   if(ckType==='ngay'){
     const from=document.getElementById('ck-from').value;
     const to  =document.getElementById('ck-to').value;
-    if(!from||!to){sumEl.textContent='Chọn ngày để kiểm tra';resEl.innerHTML='';return;}
-    if(from>to){sumEl.textContent='⚠ Ngày bắt đầu phải trước ngày kết thúc';resEl.innerHTML='';return;}
-    const days=diffDays(from,to);
-    sumEl.innerHTML=`<span class="ck-days-hi">${days} ngày</span>  ·  ${fmtDate(from)} → ${fmtDate(to)}`;
-
-    resEl.innerHTML=CAMS.map(cam=>{
-      const isBusy=bookings.some(b=>b.camera===cam&&!(to<b.start||from>b.end))
-        ||bookings.some(b=>calcBufEvents(b).some(ev=>ev.cam===cam&&ev.date>=from&&ev.date<=to));
-      const {total,label}=calcDayPrice(cam,days);
-      const sc=isBusy?'var(--danger)':'var(--success)';
-      const sb=isBusy?'rgba(168,80,80,.08)':'rgba(90,158,122,.08)';
-      return `<div class="acard ${isBusy?'busy':'free'}">
-        <div class="acard-top">
-          <div class="acard-cam" style="color:${getCamText(cam)}">${cam}</div>
-          <div class="acard-st" style="color:${sc};background:${sb}">${isBusy?'Đã có lịch':'Trống'}</div>
-        </div>
-        ${!isBusy?`<div class="acard-rows">
-          <div class="acard-row"><span class="acard-lbl">Mức giá áp dụng</span><span class="acard-val">${label}</span></div>
-          <div class="acard-total"><span class="acard-tl">Tổng tiền</span><span class="acard-tv">${fmtVND(total)}</span></div>
-        </div>`:`<div style="font-size:10px;color:var(--stone);font-weight:600">Không khả dụng trong khoảng này</div>`}
-      </div>`;
-    }).join('');
+    if(!from||!to){sumHtml='Chọn ngày để kiểm tra';resHtml='';}
+    else if(from>to){sumHtml='⚠ Ngày bắt đầu phải trước ngày kết thúc';resHtml='';}
+    else {
+      const days=diffDays(from,to);
+      sumHtml=`<span class="ck-days-hi">${days} ngày</span>  ·  ${fmtDate(from)} → ${fmtDate(to)}`;
+      resHtml=CAMS.map(cam=>{
+        const isBusy=bookings.some(b=>b.camera===cam&&!(to<b.start||from>b.end))
+          ||bookings.some(b=>calcBufEvents(b).some(ev=>ev.cam===cam&&ev.date>=from&&ev.date<=to));
+        const {total,label}=calcDayPrice(cam,days);
+        const sc=isBusy?'var(--danger)':'var(--success)';
+        const sb=isBusy?'rgba(168,80,80,.08)':'rgba(90,158,122,.08)';
+        return `<div class="acard ${isBusy?'busy':'free'}">
+          <div class="acard-top"><div class="acard-cam" style="color:${getCamText(cam)}">${cam}</div><div class="acard-st" style="color:${sc};background:${sb}">${isBusy?'Đã có lịch':'Trống'}</div></div>
+          ${!isBusy?`<div class="acard-rows">
+            <div class="acard-row"><span class="acard-lbl">Mức giá áp dụng</span><span class="acard-val" style="font-size:9px">${label}</span></div>
+            <div class="acard-total"><span class="acard-tl">Tổng tiền</span><span class="acard-tv">${fmtVND(total)}</span></div>
+          </div>`:`<div style="font-size:10px;color:var(--stone);font-weight:600">Không khả dụng</div>`}
+        </div>`;
+      }).join('');
+    }
   } else {
-    // Ca mode
     const d=document.getElementById('ck-ca-date').value;
-    if(!d){sumEl.textContent='Chọn ngày thuê';resEl.innerHTML='';return;}
-    if(!ckSelCa){sumEl.textContent=`Ngày ${fmtDate(d)} · Chọn ca bên dưới`;resEl.innerHTML='';return;}
-    sumEl.innerHTML=`Ngày ${fmtDate(d)} · <strong>${CAI[ckSelCa].icon} ${CAI[ckSelCa].label}</strong>`;
-
-    resEl.innerHTML=CAMS.map(cam=>{
-      const isBusy=bookings.some(b=>b.camera===cam&&b.rental==='ca'&&b.start===d&&b.ca===ckSelCa)
-        ||bookings.some(b=>b.camera===cam&&b.rental==='ngay'&&d>=b.start&&d<=b.end)
-        ||bookings.some(b=>calcBufEvents(b).some(ev=>ev.cam===cam&&ev.date===d&&ev.ca===ckSelCa));
-      const rate=pricing[cam].ca;
-      const sc=isBusy?'var(--danger)':'var(--success)';
-      const sb=isBusy?'rgba(168,80,80,.08)':'rgba(90,158,122,.08)';
-      return `<div class="acard ${isBusy?'busy':'free'}">
-        <div class="acard-top">
-          <div class="acard-cam" style="color:${getCamText(cam)}">${cam}</div>
-          <div class="acard-st" style="color:${sc};background:${sb}">${isBusy?'Đã có lịch':'Trống'}</div>
-        </div>
-        ${!isBusy?`<div class="acard-rows">
-          <div class="acard-row"><span class="acard-lbl">Giá thuê ca</span><span class="acard-val">${fmtVND(rate)}</span></div>
-        </div>`:`<div style="font-size:10px;color:var(--stone);font-weight:600">Ca này đã có lịch</div>`}
-      </div>`;
-    }).join('');
+    if(!d){sumHtml='Chọn ngày thuê';resHtml='';}
+    else if(!ckSelCa){sumHtml=`Ngày ${fmtDate(d)} · Chọn ca bên dưới`;resHtml='';}
+    else {
+      sumHtml=`Ngày ${fmtDate(d)} · <strong>${CAI[ckSelCa].icon} ${CAI[ckSelCa].label}</strong>`;
+      resHtml=CAMS.map(cam=>{
+        const isBusy=bookings.some(b=>b.camera===cam&&b.rental==='ca'&&b.start===d&&b.ca===ckSelCa)
+          ||bookings.some(b=>b.camera===cam&&b.rental==='ngay'&&d>=b.start&&d<=b.end)
+          ||bookings.some(b=>calcBufEvents(b).some(ev=>ev.cam===cam&&ev.date===d&&ev.ca===ckSelCa));
+        const rate=pricing[cam]?.ca||0;
+        const sc=isBusy?'var(--danger)':'var(--success)';
+        const sb=isBusy?'rgba(168,80,80,.08)':'rgba(90,158,122,.08)';
+        return `<div class="acard ${isBusy?'busy':'free'}">
+          <div class="acard-top"><div class="acard-cam" style="color:${getCamText(cam)}">${cam}</div><div class="acard-st" style="color:${sc};background:${sb}">${isBusy?'Đã có lịch':'Trống'}</div></div>
+          ${!isBusy?`<div class="acard-rows"><div class="acard-row"><span class="acard-lbl">Giá thuê ca</span><span class="acard-val">${fmtVND(rate)}</span></div></div>`:`<div style="font-size:10px;color:var(--stone);font-weight:600">Ca này đã có lịch</div>`}
+        </div>`;
+      }).join('');
+    }
   }
+  if(sumEl) sumEl.innerHTML=sumHtml;
+  if(resEl) resEl.innerHTML=resHtml;
+  if(sumElM) sumElM.innerHTML=sumHtml;
+  if(resElM) resElM.innerHTML=resHtml;
 }
 
 // ════ MODAL ════
@@ -1440,7 +1505,6 @@ function openModal(id) {
   document.getElementById('m-cam').style.color=getCamText(b.camera);
   document.getElementById('m-cust').textContent=b.name;
   document.getElementById('m-sub').textContent=`${b.phone||'Không có SĐT'} · Đặt ${b.created}`;
-
   const bufs=calcBufEvents(b);
   const eEv=bufs.find(e=>e.type==='early');
   const lEv=bufs.find(e=>e.type==='late');
@@ -1448,14 +1512,11 @@ function openModal(id) {
     eEv?`<div class="mrow"><span class="mk">🌅 Lấy sớm</span><span class="mv">${CAI[eEv.ca].label} · ${fmtDate(eEv.date)}</span></div>`:'',
     lEv?`<div class="mrow"><span class="mk">🌙 Trả muộn</span><span class="mv">${CAI[lEv.ca].label} · ${fmtDate(lEv.date)}</span></div>`:'',
   ].join('');
-
   const rentInfo=b.rental==='ca'
     ?`${CAI[b.ca]?.icon||''} ${CAI[b.ca]?.label||''} · ${fmtDate(b.start)}`
     :b.start===b.end?fmtDate(b.start):`${fmtDate(b.start)} → ${fmtDate(b.end)}`;
-
   const discRow=b.discount>0?`<div class="mrow"><span class="mk">Chiết khấu</span><span class="mv" style="color:var(--success)">${b.discount}% (tiết kiệm ${fmtVND(b.basePrice-b.price)})</span></div>`:'';
   const noteBox=b.note?`<div class="m-note"><div class="m-note-lbl">⚠ Yêu cầu đặc biệt</div><div class="m-note-txt">${b.note}</div></div>`:'';
-
   document.getElementById('m-body').innerHTML=`
     <div class="mrow"><span class="mk">Hình thức</span><span class="mv">${b.rental==='ca'?'Thuê theo ca':'Thuê theo ngày'}</span></div>
     <div class="mrow"><span class="mk">Thời gian</span><span class="mv">${rentInfo}</span></div>
@@ -1467,13 +1528,10 @@ function openModal(id) {
     ${(b.depositAmt&&b.depositAmt>0)?`<div class="mrow"><span class="mk">Đã cọc</span><span class="mv">${fmtVND(b.depositAmt)}</span></div>
     <div class="mrow"><span class="mk">${b.depositAmt>=b.price?'Hoàn lại khách':'Còn thiếu'}</span><span class="mv" style="font-size:14px;color:${b.depositAmt>=b.price?'var(--success)':'var(--danger)'}">${fmtVND(Math.abs(b.depositAmt-b.price))}</span></div>`:''}
     ${noteBox}`;
-
   document.getElementById('m-del-btn').onclick=()=>{deleteBooking(id);closeModal();};
   document.getElementById('modal').classList.add('open');
 }
-
 function closeModal(){document.getElementById('modal').classList.remove('open');}
-document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal();});
 
 function toast(msg,isErr=false){
   const el=document.getElementById('toast');
@@ -1490,19 +1548,18 @@ function setBlistMode(m){
   document.getElementById('bl-range-ctrl').style.display=m==='range'?'flex':'none';
   renderAdminBlist();
 }
-
 function getAdminBlistFiltered(){
   let list;
-  const camSel = blistMode==='month'
-    ? document.getElementById('export-cam').value
-    : document.getElementById('export-cam-range').value;
+  const camSel=blistMode==='month'
+    ?document.getElementById('export-cam').value
+    :document.getElementById('export-cam-range').value;
   if(blistMode==='month'){
     const ym=document.getElementById('export-month').value;
     list=bookings.filter(b=>b.start.startsWith(ym));
   } else {
     const from=document.getElementById('bl-range-from').value;
     const to  =document.getElementById('bl-range-to').value;
-    if(!from||!to){ return []; }
+    if(!from||!to) return [];
     list=bookings.filter(b=>b.start>=from&&b.start<=to);
   }
   if(adminFilter!=='all') list=list.filter(b=>b.camera===adminFilter);
@@ -1530,28 +1587,35 @@ function addNewCam(){
 }
 
 function refreshCamSelects(){
-  // Update cam filter buttons in admin blist
   const filtersEl=document.getElementById('blist-cam-filters');
   if(filtersEl){
     filtersEl.innerHTML=`<button class="fbtn ${adminFilter==='all'?'on':''}" onclick="setAFilter(this,'all')">Tất cả</button>`
       +CAMS.map(c=>`<button class="fbtn ${adminFilter===c?'on':''}" onclick="setAFilter(this,'${c}')">${c}</button>`).join('');
   }
-  // Update export-cam selects
   const camOpts='<option value="all">Tất cả máy</option>'+CAMS.map(c=>`<option value="${c}">${c}</option>`).join('');
   const ec=document.getElementById('export-cam');
   const ecr=document.getElementById('export-cam-range');
   if(ec) ec.innerHTML=camOpts;
   if(ecr) ecr.innerHTML=camOpts;
-  // Update calendar legend
   renderCalendarLegend();
 }
 
 function renderCalendarLegend(){
-  const lgEl=document.querySelector('.legend');
+  const lgEl=document.getElementById('cal-legend');
   if(!lgEl) return;
-  lgEl.innerHTML=CAMS.map(c=>`<div class="leg-i"><div class="leg-d" style="background:${getCamColor(c)};opacity:.7"></div>${c}</div>`).join('')
+  lgEl.innerHTML=CAMS.map(c=>`<div class="leg-i"><div class="leg-d" style="background:${getCamColor(c)};opacity:.8"></div>${c}</div>`).join('')
     +`<div class="leg-i"><div class="leg-d" style="background:var(--pearl3);border:1px dashed var(--stone)"></div>Buffer</div>`;
 }
+
+// ════ SWIPE TO CLOSE CHECKER SHEET ════
+(function(){
+  let startY=0;
+  const sheet=document.getElementById('checker-sheet');
+  sheet.addEventListener('touchstart',e=>{startY=e.touches[0].clientY;},{passive:true});
+  sheet.addEventListener('touchend',e=>{
+    if(e.changedTouches[0].clientY-startY>60) closeCheckerSheet();
+  },{passive:true});
+})();
 
 init();
 </script>
