@@ -339,6 +339,37 @@ body{font-family:'Mulish',sans-serif;background:var(--pearl);color:var(--warm-da
 .toast{position:fixed;bottom:max(22px,calc(env(safe-area-inset-bottom)+12px));left:50%;transform:translateX(-50%) translateY(20px);padding:10px 18px;border-radius:999px;font-size:12px;font-weight:700;z-index:600;opacity:0;transition:all .22s ease;pointer-events:none;box-shadow:var(--sh-md);white-space:nowrap;max-width:90vw;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
+/* ══ SYNC STATUS ══ */
+.sync-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;transition:background .3s}
+.sync-dot.ok{background:#5a9e7a}
+.sync-dot.syncing{background:#b8863a;animation:pulse .8s ease infinite}
+.sync-dot.err{background:#a85050}
+.sync-dot.local{background:#b5ada4}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.sync-pill{display:flex;align-items:center;gap:5px;background:var(--pearl2);border:1px solid var(--pearl3);padding:3px 9px;border-radius:999px;font-size:10px;font-weight:700;color:var(--warm-mid);cursor:pointer;transition:border-color .15s;white-space:nowrap}
+.sync-pill:hover{border-color:var(--gold)}
+
+/* ══ SETUP MODAL ══ */
+.setup-overlay{display:none;position:fixed;inset:0;background:rgba(42,37,32,.55);backdrop-filter:blur(6px);z-index:700;align-items:center;justify-content:center;padding:16px}
+.setup-overlay.open{display:flex}
+.setup-box{background:var(--cream);border:1px solid var(--pearl3);border-radius:16px;padding:24px;width:100%;max-width:480px;box-shadow:var(--sh-md);max-height:90vh;overflow-y:auto}
+.setup-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;font-weight:400;color:var(--warm-dark);margin-bottom:4px}
+.setup-sub{font-size:12px;color:var(--stone);font-weight:600;margin-bottom:18px;line-height:1.6}
+.setup-step{display:flex;gap:10px;margin-bottom:12px;align-items:flex-start}
+.step-num{width:22px;height:22px;border-radius:50%;background:var(--warm-dark);color:var(--cream);font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-txt{font-size:12px;color:var(--warm-dark);font-weight:600;line-height:1.6}
+.step-txt code{background:var(--pearl2);border:1px solid var(--pearl3);border-radius:4px;padding:1px 5px;font-size:11px;font-family:monospace;color:var(--warm-dark)}
+.setup-url-row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.setup-url-input{flex:1;min-width:200px;background:var(--pearl);border:1px solid var(--pearl3);color:var(--warm-dark);padding:10px 12px;border-radius:var(--r);font-family:'Mulish',sans-serif;font-size:12px;font-weight:500;outline:none;transition:border-color .2s}
+.setup-url-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim)}
+.setup-btn{background:var(--warm-dark);color:var(--cream);border:none;padding:10px 18px;border-radius:var(--r);font-family:'Mulish',sans-serif;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;transition:all .15s}
+.setup-btn:hover{background:var(--ink)}
+.setup-skip{background:none;border:none;color:var(--stone);font-size:11px;font-weight:700;cursor:pointer;font-family:'Mulish',sans-serif;padding:8px 0;width:100%;text-align:center;margin-top:6px}
+.setup-gas-code{background:var(--pearl2);border:1px solid var(--pearl3);border-radius:8px;padding:10px 12px;font-size:10px;font-family:monospace;color:var(--warm-mid);line-height:1.6;margin-top:8px;white-space:pre-wrap;word-break:break-all;max-height:200px;overflow-y:auto;cursor:text;user-select:all}
+.copy-btn{display:inline-flex;align-items:center;gap:4px;background:var(--pearl2);border:1px solid var(--pearl3);color:var(--taupe);padding:4px 10px;border-radius:6px;font-size:10px;font-weight:800;cursor:pointer;font-family:'Mulish',sans-serif;transition:all .15s;margin-top:6px}
+.copy-btn:hover{border-color:var(--gold);color:var(--warm-dark)}
+
+
 /* ══ RESPONSIVE BREAKPOINTS ══ */
 
 /* Tablet: hide checker panel, show checker button */
@@ -417,6 +448,10 @@ body{font-family:'Mulish',sans-serif;background:var(--pearl);color:var(--warm-da
   </div>
   <div class="topbar-right">
     <div class="hpills">
+      <div class="sync-pill" onclick="openSetup()" title="Trạng thái đồng bộ — nhấn để cài đặt">
+        <div class="sync-dot local" id="sync-dot"></div>
+        <span id="sync-lbl">Cục bộ</span>
+      </div>
       <div class="hpill"><div class="hpdot" style="background:var(--cam-xs20)"></div><span id="hp-kh">0 KH tháng này</span></div>
       <div class="hpill"><div class="hpdot" style="background:var(--warn)"></div><span id="hp-del">0 giao hôm nay</span></div>
     </div>
@@ -747,6 +782,49 @@ body{font-family:'Mulish',sans-serif;background:var(--pearl);color:var(--warm-da
   </div>
 </div>
 
+<!-- ══ SETUP MODAL ══ -->
+<div class="setup-overlay" id="setup-overlay" onclick="if(event.target===this)closeSetup()">
+  <div class="setup-box">
+    <div class="setup-title">Đồng bộ qua GitHub Gist</div>
+    <div class="setup-sub">Lưu dữ liệu vào GitHub Gist — miễn phí, đồng bộ tức thì giữa mọi thiết bị. Chỉ cần tài khoản GitHub.</div>
+
+    <div class="setup-step">
+      <div class="step-num">1</div>
+      <div class="step-txt">Vào <strong>github.com → Settings → Developer settings → Personal access tokens → Tokens (classic)</strong> → Nhấn <code>Generate new token</code> → Tích vào quyền <code>gist</code> → Generate → Sao chép token</div>
+    </div>
+
+    <div class="setup-step">
+      <div class="step-num">2</div>
+      <div class="step-txt">Dán token vào ô bên dưới. Nếu bạn chưa có Gist, để trống ô Gist ID — hệ thống sẽ tự tạo. Nếu đã có Gist từ thiết bị khác, dán Gist ID vào để dùng chung.</div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+      <div>
+        <label style="font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--taupe);text-transform:uppercase;display:block;margin-bottom:4px">Personal Access Token *</label>
+        <input class="setup-url-input" id="gas-url-input-token" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" style="width:100%">
+      </div>
+      <div>
+        <label style="font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--taupe);text-transform:uppercase;display:block;margin-bottom:4px">Gist ID <span style="font-weight:600;color:var(--stone)">(để trống nếu chưa có)</span></label>
+        <div style="display:flex;gap:8px">
+          <input class="setup-url-input" id="gas-url-input-gist" type="text" placeholder="a1b2c3d4e5f6... (tự tạo nếu để trống)" style="flex:1">
+          <button class="copy-btn" onclick="copyGasCode()" title="Sao chép Gist ID hiện tại">📋</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:12px">
+      <button class="setup-btn" style="width:100%;padding:12px" onclick="connectGAS()">🔗 Kết nối &amp; đồng bộ</button>
+    </div>
+    <div id="setup-status" style="font-size:11px;font-weight:700;margin-top:8px;min-height:18px;text-align:center"></div>
+
+    <div style="background:var(--pearl2);border:1px solid var(--pearl3);border-radius:8px;padding:10px 12px;margin-top:10px;font-size:10px;color:var(--stone);font-weight:600;line-height:1.6">
+      💡 <strong>Dùng chung trên nhiều máy:</strong> Sau khi kết nối trên máy đầu tiên, sao chép Gist ID (nhấn 📋) → Dán vào máy thứ hai cùng với token → Nhấn Kết nối
+    </div>
+
+    <button class="setup-skip" onclick="closeSetup()">✕ Đóng (tiếp tục dùng cục bộ)</button>
+  </div>
+</div>
+
 <!-- ══ DETAIL MODAL ══ -->
 <div class="moverlay" id="modal" onclick="if(event.target===this)closeModal()">
   <div class="modal">
@@ -793,6 +871,9 @@ let machines    = JSON.parse(localStorage.getItem('hana7_machines') || JSON.stri
 let bufferFee   = JSON.parse(localStorage.getItem('hana7_buffee')   || '{"early":50000,"late":50000}');
 let adminPw     = localStorage.getItem('hana7_pw') || 'hana2024';
 let adminOpen   = false;
+let gasUrl      = localStorage.getItem('hana7_gas_url') || '';
+let syncTimer   = null;
+let lastSyncTs  = 0;
 let curMonth    = new Date();
 let selCam      = null;
 let rentType    = 'ngay';
@@ -836,6 +917,9 @@ function init() {
   renderHeaderStats();
   renderCalendarLegend();
   runChecker();
+  // Init sync status
+  if(gasUrl){ setSyncStatus('syncing','Đang tải...'); startAutoSync(); }
+  else setSyncStatus('local','Cục bộ');
 }
 
 // ════ UTILS ════
@@ -844,7 +928,179 @@ const addDays  = (ds,n)=>{ const d=new Date(ds); d.setDate(d.getDate()+n); retur
 const diffDays = (a,b)=>Math.round((new Date(b)-new Date(a))/86400000)+1;
 const fmtDate  = ds=>{ if(!ds)return'—'; const[y,m,d]=ds.split('-'); return`${d}/${m}/${y}`; };
 const fmtVND   = n=>Math.round(n).toLocaleString('vi-VN')+'đ';
-function save() { localStorage.setItem('hana7_bookings',JSON.stringify(bookings)); }
+function save() {
+  localStorage.setItem('hana7_bookings',JSON.stringify(bookings));
+  if(gasUrl) schedulePush();
+}
+
+// ════ GAS SYNC ════
+// ════ GITHUB GIST SYNC ════
+// gasUrl here actually = gist config JSON: { gistId, token }
+// We reuse gasUrl variable name for compatibility
+
+function setSyncStatus(state, label) {
+  const dot = document.getElementById('sync-dot');
+  const lbl = document.getElementById('sync-lbl');
+  if(dot) dot.className='sync-dot '+state;
+  if(lbl) lbl.textContent = label;
+}
+
+function getGistConfig() {
+  try { return JSON.parse(gasUrl || 'null'); } catch(e) { return null; }
+}
+
+function schedulePush() {
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(pushToGist, 800);
+}
+
+async function pushToGist() {
+  const cfg = getGistConfig();
+  if(!cfg) return;
+  setSyncStatus('syncing','Đang lưu...');
+  try {
+    const payload = {
+      bookings, pricing, machines,
+      cams: CAMS, bufferFee,
+      ts: Date.now()
+    };
+    const res = await fetch(`https://api.github.com/gists/${cfg.gistId}`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `token ${cfg.token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        files: { 'hana_data.json': { content: JSON.stringify(payload) } }
+      })
+    });
+    if(res.ok) {
+      lastSyncTs = Date.now();
+      setSyncStatus('ok', fmtSyncTime(lastSyncTs));
+    } else {
+      setSyncStatus('err','Lỗi lưu');
+    }
+  } catch(e) {
+    setSyncStatus('err','Mất kết nối');
+  }
+}
+
+async function pushSettingsToGAS() {
+  // Settings are bundled in the main push for Gist
+  schedulePush();
+}
+
+async function pullFromGAS() {
+  const cfg = getGistConfig();
+  if(!cfg) { setSyncStatus('local','Cục bộ'); return; }
+  setSyncStatus('syncing','Đang tải...');
+  try {
+    const res = await fetch(`https://api.github.com/gists/${cfg.gistId}`, {
+      headers: { 'Authorization': `token ${cfg.token}` }
+    });
+    if(!res.ok) { setSyncStatus('err','Lỗi tải'); return; }
+    const gist = await res.json();
+    const raw = gist.files?.['hana_data.json']?.content;
+    if(!raw) { setSyncStatus('ok','Trống'); return; }
+    const d = JSON.parse(raw);
+    if(Array.isArray(d.bookings)) {
+      bookings = d.bookings;
+      localStorage.setItem('hana7_bookings', JSON.stringify(bookings));
+    }
+    if(d.pricing)   { pricing=d.pricing;     localStorage.setItem('hana7_pricing',JSON.stringify(pricing)); }
+    if(d.machines)  { machines=d.machines;   localStorage.setItem('hana7_machines',JSON.stringify(machines)); }
+    if(Array.isArray(d.cams)) { CAMS=d.cams; localStorage.setItem('hana7_cams',JSON.stringify(CAMS)); }
+    if(d.bufferFee) { bufferFee=d.bufferFee; localStorage.setItem('hana7_buffee',JSON.stringify(bufferFee)); }
+    lastSyncTs = d.ts || Date.now();
+    setSyncStatus('ok', fmtSyncTime(lastSyncTs));
+    renderCalendar(); renderHeaderStats(); refreshCamSelects(); runChecker();
+    if(adminOpen){ renderStats(); renderAdminBlist(); renderPricingSettings(); renderMachineSettings(); updateBufFeeLabel(); }
+  } catch(e) {
+    setSyncStatus('err','Mất kết nối');
+  }
+}
+
+function fmtSyncTime(ts) {
+  if(!ts) return 'Đã đồng bộ';
+  const d = new Date(ts);
+  return `Sync ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+function startAutoSync() {
+  const cfg = getGistConfig();
+  if(!cfg) return;
+  pullFromGAS();
+  setInterval(pullFromGAS, 30000);
+}
+
+// ════ SETUP MODAL ════
+function openSetup() {
+  const cfg = getGistConfig();
+  document.getElementById('gas-url-input-token').value = cfg?.token || '';
+  document.getElementById('gas-url-input-gist').value  = cfg?.gistId || '';
+  document.getElementById('setup-status').textContent = '';
+  document.getElementById('setup-overlay').classList.add('open');
+}
+function closeSetup() {
+  document.getElementById('setup-overlay').classList.remove('open');
+}
+
+async function connectGAS() {
+  const token  = document.getElementById('gas-url-input-token').value.trim();
+  const gistId = document.getElementById('gas-url-input-gist').value.trim();
+  const statusEl = document.getElementById('setup-status');
+
+  if(!token) { statusEl.style.color='var(--danger)'; statusEl.textContent='⚠ Nhập Personal Access Token'; return; }
+
+  statusEl.style.color='var(--warn)'; statusEl.textContent='Đang kiểm tra...';
+
+  try {
+    let finalGistId = gistId;
+
+    if(!finalGistId) {
+      // Create new gist
+      statusEl.textContent='Đang tạo Gist mới...';
+      const init = { bookings:[], pricing:{}, machines:{}, cams:[], bufferFee:{early:50000,late:50000}, ts:Date.now() };
+      const res = await fetch('https://api.github.com/gists', {
+        method: 'POST',
+        headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          description: 'hana.fujifilm rental data',
+          public: false,
+          files: { 'hana_data.json': { content: JSON.stringify(init) } }
+        })
+      });
+      if(!res.ok) { statusEl.style.color='var(--danger)'; statusEl.textContent='⚠ Token không hợp lệ hoặc thiếu quyền gist'; return; }
+      const g = await res.json();
+      finalGistId = g.id;
+      document.getElementById('gas-url-input-gist').value = finalGistId;
+    } else {
+      // Verify existing gist
+      const res = await fetch(`https://api.github.com/gists/${finalGistId}`, {
+        headers: { 'Authorization': `token ${token}` }
+      });
+      if(!res.ok) { statusEl.style.color='var(--danger)'; statusEl.textContent='⚠ Gist ID không tồn tại hoặc không có quyền truy cập'; return; }
+    }
+
+    // Save config
+    gasUrl = JSON.stringify({ token, gistId: finalGistId });
+    localStorage.setItem('hana7_gas_url', gasUrl);
+    statusEl.style.color='var(--success)';
+    statusEl.textContent=`✓ Kết nối thành công! Gist ID: ${finalGistId}`;
+    setTimeout(()=>{ closeSetup(); startAutoSync(); }, 1400);
+
+  } catch(e) {
+    statusEl.style.color='var(--danger)';
+    statusEl.textContent='⚠ Lỗi kết nối: '+e.message;
+  }
+}
+
+function copyGasCode() {
+  const cfg = getGistConfig();
+  if(cfg?.gistId) {
+    navigator.clipboard?.writeText(cfg.gistId).then(()=>toast('✓ Đã sao chép Gist ID'));
+  }
+}
 
 // ════ TABS ════
 function switchTab(name, desktopEl, mobileId) {
@@ -1025,6 +1281,7 @@ function savePricing() {
   localStorage.setItem('hana7_pricing',JSON.stringify(pricing));
   toast('✓ Đã lưu giá');
   updatePrice();
+  if(gasUrl) pushSettingsToGAS();
 }
 function renderMachineSettings() {
   document.getElementById('machine-settings').innerHTML=CAMS.map(cam=>{
@@ -1087,6 +1344,7 @@ function saveMachines() {
   localStorage.setItem('hana7_pricing',JSON.stringify(pricing));
   toast('✓ Đã lưu thông tin máy');
   refreshCamSelects(); renderPricingSettings(); renderMachineSettings(); renderCalendar();
+  if(gasUrl) pushSettingsToGAS();
 }
 function removeCam(cam){
   if(['X100V','XS20','XS10','XT4'].includes(cam)) return toast('Không thể xóa máy mặc định',true);
@@ -1104,6 +1362,7 @@ function saveBufferFee() {
   bufferFee.late =parseInt(document.getElementById('buf-late-fee').value)||0;
   localStorage.setItem('hana7_buffee',JSON.stringify(bufferFee));
   updateBufFeeLabel(); toast('✓ Đã lưu phí buffer'); updatePrice();
+  if(gasUrl) pushSettingsToGAS();
 }
 function updateBufFeeLabel() {
   const el=document.getElementById('buf-fee-label');
